@@ -40,50 +40,29 @@ export const userEmailsSchema = z.array(
 export const githubUserSchema = z
   .object({
     login: z.string(),
-    html_url: z.string().url(),
+    id: z.number(),
     node_id: z.string(),
-    name: z.string().nullable(),
-    // email: z.string().nullable(), // not relying on this
+    email: z.string().nullable(),
     avatar_url: z.string().url(),
+    html_url: z.string().url(),
+    // followers_url: z.string().url(),
+    // following_url: z.string().url(),
+    gists_url: z.string().url(),
+    starred_url: z.string().url(), // if you omit {/owner}{/repo} then this gives ALL starred repos of that user
+    subscriptions_url: z.string().url(), // all PUBLIC repos that the user is watching
+    organizations_url: z.string().url(), // all PUBLIC orgs that the user is a member of
+    name: z.string().nullable(),
     company: z.string().nullable(),
+    blog: z.string().url().nullable(), // could be useful to visit and get some info
+    hireable: z.boolean().nullable(), // only acceptable values seems to be true or null
     location: z.string().nullable(),
     bio: z.string().nullable(),
-    twitter_username: z.string().nullable(),
+    twitter_username: z.string().nullable(), // could be useful to visit and get some info
+    public_repos: z.number(),
+    public_gists: z.number(),
+    followers: z.number(),
+    following: z.number(),
+    created_at: z.string().datetime(),
+    updated_at: z.string().datetime(),
   })
   .strip();
-
-// export const githubLabelSchema = z
-//   .object({
-//     node_id: z.string(),
-//     name: z.string(),
-//     color: z.string(),
-//     description: z.string().nullable().optional(),
-//   })
-//   .strip();
-
-// export const githubCommentSchema = z.object({
-//   author: githubUserSchema,
-//   body: z.string(),
-//   created_at: z.string().datetime(),
-//   updated_at: z.string().datetime(),
-// });
-
-// export const githubIssueSchema = z
-//   .object({
-//     node_id: z.string(),
-//     number: z.number(),
-//     title: z.string(),
-//     state: z.enum(["open", "closed"]),
-//     user: githubUserSchema,
-//     pull_request: z.object({}).optional(),
-//     created_at: z.string().datetime(),
-//     updated_at: z.string().datetime(),
-//     closed_at: z.string().datetime().nullable(),
-//     labels: z.array(githubLabelSchema),
-//     html_url: z.string().url(),
-//     body: z.string().nullable(),
-//     draft: z.boolean().optional(),
-//     state_reason: z.enum(["completed", "reopened", "not_planned"]).nullable(),
-//     comments: z.array(githubCommentSchema),
-//   })
-//   .strip();
