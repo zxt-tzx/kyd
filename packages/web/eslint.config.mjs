@@ -75,7 +75,7 @@ export default [
         },
       ],
       "tailwindcss/no-custom-classname": "off",
-      "tailwindcss/classnames-order": "error",
+      "tailwindcss/classnames-order": "warn",
     },
   },
 ];
