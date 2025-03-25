@@ -5,6 +5,7 @@ const apiFn = new sst.aws.Function("ApiFn", {
   url: true,
   handler: "./packages/functions/src/api.handler",
   link: [...allSecrets],
+  runtime: "nodejs22.x",
 });
 
 export const apiUrl = apiFn.url;
