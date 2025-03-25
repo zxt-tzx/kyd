@@ -1,0 +1,14 @@
+{
+  "name": "@know-your-dev/scripts",
+  "version": "0.0.0",
+  "type": "module",
+  "dependencies": {
+    "@know-your-dev/core": "workspace:*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "shell": "sst shell -- bun",
+    "shell:uat": "sst shell --stage uat -- bun",
+    "shell:prod": "sst shell --stage prod -- bun"
+  }
+}

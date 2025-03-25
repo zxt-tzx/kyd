@@ -1,0 +1,18 @@
+{
+  "name": "@know-your-dev/functions",
+  "version": "0.0.0",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --build"
+  },
+  "dependencies": {
+    "@know-your-dev/core": "workspace:*",
+    "@hono/zod-validator": "^0.4.2",
+    "@openauthjs/openauth": "*",
+    "hono": "^4.6.17"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.114",
+    "@types/node": "^22.10.1"
+  }
+}
