@@ -8,10 +8,7 @@ export function Homepage() {
           Know Your Dev
         </h1>
         <div className="mx-auto mb-8 max-w-md">
-          <DevSearchInput
-            // eslint-disable-next-line jsx-a11y/no-autofocus
-            autoFocus={true}
-          />
+          <DevSearchInput />
         </div>
       </div>
     </div>

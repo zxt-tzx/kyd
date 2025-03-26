@@ -9,8 +9,11 @@ export default defineConfig({
   plugins: [TanStackRouterVite({}), react()],
   resolve: {
     alias: {
+      // eslint-disable-next-line no-undef
       "@/core": path.resolve(__dirname, "../core/src"),
+      // eslint-disable-next-line no-undef
       "@/functions": path.resolve(__dirname, "../functions/src"),
+      // eslint-disable-next-line no-undef
       "@": path.resolve(__dirname, "./src"),
     },
   },
@@ -65,9 +68,11 @@ export default defineConfig({
     port: 3001,
     https: {
       key: fs.readFileSync(
+        // eslint-disable-next-line no-undef
         path.resolve(__dirname, "./certs/local.kyd.theintel.io-key.pem"),
       ),
       cert: fs.readFileSync(
+        // eslint-disable-next-line no-undef
         path.resolve(__dirname, "./certs/local.kyd.theintel.io.pem"),
       ),
     },

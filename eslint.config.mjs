@@ -9,6 +9,7 @@ export default [
       "**/routeTree.gen.ts",
       "**/dist/**/*",
       "**/build/**/*",
+      "packages/web/**/*",
     ],
   },
   {

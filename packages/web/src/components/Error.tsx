@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 
 export function Error({ error }: { error: Error }) {
   const router = useRouter();
+  // eslint-disable-next-line no-undef
   const isDev = process.env.NODE_ENV !== "production";
 
   const queryClientErrorBoundary = useQueryErrorResetBoundary();
