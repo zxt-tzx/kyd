@@ -6,6 +6,7 @@ import {
   MapPinIcon,
 } from "lucide-react";
 
+import { useResearchDev } from "@/lib/hooks/useDev";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { XTwitterIcon } from "@/components/icons/XTwitterIcon";
@@ -36,6 +37,7 @@ export function UserPreview({
   twitterUsername,
   className,
 }: UserPreviewProps) {
+  const researchDevMutation = useResearchDev();
   return (
     <div
       className={cn(
@@ -45,7 +47,11 @@ export function UserPreview({
     >
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Is this your dev?</h2>
-        <Button variant="secondary" size="sm">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => researchDevMutation.mutate(login)}
+        >
           Start research
         </Button>
       </div>

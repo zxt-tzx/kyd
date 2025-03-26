@@ -34,7 +34,8 @@ export const client = hc<ApiRoutes>(apiUrl, {
   fetch: (input: RequestInfo | URL, init?: RequestInit) =>
     fetch(input, {
       ...init,
-      credentials: "include",
+      // todo: include this and settle CORS
+      // credentials: "include",
       redirect: "follow",
     }),
 }).api;
