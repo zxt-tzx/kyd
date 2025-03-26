@@ -7,7 +7,7 @@ export function Navbar() {
   const standardLogo = (
     <div className="flex items-center gap-2">
       <RadarIcon className="size-6 text-primary" />
-      <span className="text-primary">Know Your Dev</span>
+      <span className="text-primary">KYD</span>
     </div>
   );
   const lightModeLogo = (

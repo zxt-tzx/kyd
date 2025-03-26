@@ -1,86 +1,50 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-interface DevSearchInputProps {
-  autoFocus?: boolean;
-  onSubmit?: (value: string) => void;
-}
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export function DevSearchInput({
-  autoFocus = false,
-  onSubmit,
-}: DevSearchInputProps) {
+import { useCursorAnimation } from "../../hooks/useCursorAnimation";
+
+export function DevSearchInput() {
   const [value, setValue] = useState("");
-  const [focused, setFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (autoFocus && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [autoFocus]);
-
-  const handleFocus = () => {
-    setFocused(true);
-  };
-
-  const handleBlur = () => {
-    setFocused(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && onSubmit) {
-      onSubmit(value);
-    }
-  };
-
-  // For keyboard accessibility
-  const handleKeyUp = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter" || e.key === " ") {
-      inputRef.current?.focus();
-    }
-  };
+  const { cursor, cursorClassName } = useCursorAnimation({
+    cursorStyle: "_",
+  });
 
   return (
-    <>
-      <label
-        id="github-input-label"
-        htmlFor="github-input"
-        className="mb-2 block text-left font-mono text-lg"
+    <div className="space-y-2">
+      <Label
+        htmlFor="github-username-input"
+        className="block text-left font-mono text-lg"
       >
-        Enter GitHub username or URL of your dev:
-      </label>
+        Enter your dev&apos;s GitHub username:
+      </Label>
 
-      <div
-        ref={containerRef}
-        role="textbox"
-        aria-labelledby="github-input-label"
-        tabIndex={0}
-        className="relative h-12 rounded-md border border-primary bg-background px-3 py-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2"
-        onClick={() => inputRef.current?.focus()}
-        onKeyUp={handleKeyUp}
-      >
-        <div className="flex h-full items-center font-mono text-lg">
-          <span>{value}</span>
-          {/* Always show the blinking cursor when empty, or when focused */}
-          {(value === '' || focused) && (
-            <span className="blinking-cursor ml-0.5">_</span>
-          )}
-        </div>
-        <input
+      <div className="relative">
+        <Input
           ref={inputRef}
-          id="github-input"
-          aria-label="GitHub username or URL input"
+          id="github-username-input"
           type="text"
-          className="absolute inset-0 size-full cursor-text opacity-0"
+          className="h-12 border border-primary font-mono text-lg text-transparent caret-transparent"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          autoCapitalize="none"
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
         />
+        <div className="pointer-events-none absolute inset-0 flex items-center px-3 font-mono text-lg">
+          {/* use pre instead of span to preserve whitespace */}
+          <pre className="m-0 whitespace-pre p-0 text-[16px] text-foreground">
+            {value}
+          </pre>
+          {/* Show the cursor at the end of the text */}
+          {isFocused && <span className={cursorClassName}>{cursor}</span>}
+        </div>
       </div>
-    </>
+    </div>
   );
 }
