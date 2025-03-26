@@ -37,6 +37,8 @@ export const userEmailsSchema = z.array(
   }),
 );
 
+export type GitHubUser = z.infer<typeof githubUserSchema>;
+
 export const githubUserSchema = z
   .object({
     login: z.string(),
