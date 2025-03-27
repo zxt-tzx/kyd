@@ -41,9 +41,15 @@ export function DevSearchInput() {
         setError(null);
         setIsLoadingPreview(true);
         const user = await fetchUser(result.data);
+        if (user.type === "Organization") {
+          throw new Error(
+            "Please make sure this is not an organization account",
+          );
+        }
         setPreview(user);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch user");
+        setPreview(null);
       } finally {
         setIsLoadingPreview(false);
       }
