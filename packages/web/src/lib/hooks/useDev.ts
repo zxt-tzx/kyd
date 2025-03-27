@@ -15,6 +15,7 @@ export const useResearchDev = () => {
       toast({
         title: `Research on ${username} initiated`,
         description: message,
+        duration: 10000,
       });
     },
     onError: (error) => {

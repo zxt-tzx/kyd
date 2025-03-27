@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { RadarIcon } from "lucide-react";
+import { UserSearchIcon } from "lucide-react";
 
 import { DarkModeToggle } from "@/components/navbar/DarkModeToggle";
 
 export function Navbar() {
   const standardLogo = (
     <div className="flex items-center gap-2">
-      <RadarIcon className="size-6 text-primary" />
+      <UserSearchIcon className="size-6 text-primary" />
       <span className="text-primary">KYD</span>
     </div>
   );

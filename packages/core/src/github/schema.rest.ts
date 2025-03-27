@@ -55,7 +55,7 @@ export const githubUserSchema = z
     organizations_url: z.string().url(), // all PUBLIC orgs that the user is a member of
     name: z.string().nullable(),
     company: z.string().nullable(),
-    blog: z.string().url().nullable(), // could be useful to visit and get some info
+    blog: z.string().nullable(), // could be useful to visit and get some info
     hireable: z.boolean().nullable(), // only acceptable values seems to be true or null
     location: z.string().nullable(),
     bio: z.string().nullable(),
