@@ -17,7 +17,7 @@ export const devRouter = new Hono<Context>().post(
       createSuccessResponse({
         data: { username },
         message:
-          "Please wait while our AI agents conduct research based on the public GitHub activity of this developer.",
+          "Please wait while our AI agents research this developer's GitHub activity.",
       }),
     );
   },

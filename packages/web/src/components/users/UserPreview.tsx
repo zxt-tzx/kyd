@@ -2,6 +2,7 @@ import {
   BuildingIcon,
   GlobeIcon,
   InfoIcon,
+  Loader2Icon,
   LoaderIcon,
   MailIcon,
   MapPinIcon,
@@ -41,6 +42,8 @@ export function UserPreview({
   className,
 }: UserPreviewProps) {
   const researchDevMutation = useResearchDev();
+  const isLoading = researchDevMutation.isPending;
+
   return (
     <div
       className={cn(
@@ -116,7 +119,11 @@ export function UserPreview({
           size="sm"
           className="w-full"
           onClick={() => researchDevMutation.mutate(login)}
+          disabled={isLoading}
         >
+          {isLoading ? (
+            <Loader2Icon className="mr-2 size-4 animate-spin" />
+          ) : null}
           YES
         </Button>
         <Button
@@ -124,6 +131,7 @@ export function UserPreview({
           size="sm"
           className="w-full"
           onClick={onCancel}
+          disabled={isLoading}
         >
           NO
         </Button>
