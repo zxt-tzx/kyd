@@ -1,22 +1,19 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 
-import { queryKeys } from "@/lib/queryClient";
+// import { queryKeys } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 import { researchDev } from "../api/dev";
 
 export const useResearchDev = () => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const { toast } = useToast();
 
   return useMutation({
     mutationFn: (username: string) => researchDev(username),
-    onSuccess: ({ data: { username }, message }) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.dev.research(username),
-      });
+    onSuccess: ({ message, data: { username } }) => {
       toast({
-        title: "Research completed successfully",
+        title: `Research on ${username} initiated`,
         description: message,
       });
     },

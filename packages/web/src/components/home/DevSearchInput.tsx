@@ -47,6 +47,8 @@ export function DevSearchInput() {
           );
         }
         setPreview(user);
+        // blur the input to dismiss the keyboard on mobile
+        inputRef.current?.blur();
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch user");
         setPreview(null);

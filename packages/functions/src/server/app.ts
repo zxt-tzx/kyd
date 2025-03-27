@@ -6,7 +6,6 @@ import { Resource } from "sst";
 
 import type { ErrorResponse } from "./response";
 import { devRouter } from "./router/dev.router";
-import { dummyRouter } from "./router/dummy.router";
 
 export interface Context extends Env {
   // Variables: {
@@ -38,7 +37,6 @@ app.get("/", async (c) => {
 const _routes = app
   // Create the base app with /api prefix
   .basePath("/api")
-  .route("/dummy", dummyRouter)
   .route("/dev", devRouter);
 // Protected user-specific routes
 // .use("/me/*", authMiddleware) // Apply middleware to all /me routes

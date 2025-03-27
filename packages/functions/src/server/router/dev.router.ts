@@ -12,10 +12,12 @@ export const devRouter = new Hono<Context>().post(
   zValidator("json", z.object({ username: githubUsernameSchema })),
   async (c) => {
     const username = c.req.valid("json").username;
+    // insert row into db
     return c.json(
       createSuccessResponse({
         data: { username },
-        message: "test test",
+        message:
+          "Please wait while our AI agents conduct research based on the public GitHub activity of this developer.",
       }),
     );
   },
