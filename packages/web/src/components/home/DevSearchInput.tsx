@@ -20,9 +20,10 @@ export function DevSearchInput() {
   > | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { cursor, cursorClassName } = useCursorAnimation({
+  const { cursor, cursorClassName, showCursor } = useCursorAnimation({
     cursorStyle: "_",
   });
 
@@ -80,16 +81,33 @@ export function DevSearchInput() {
                 onChange={(e) => field.handleChange(e.target.value)}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
+                onKeyUp={(e) => {
+                  if (e.target instanceof HTMLInputElement) {
+                    setCursorPosition(e.target.selectionStart ?? 0);
+                  }
+                }}
+                onClick={(e) => {
+                  if (e.target instanceof HTMLInputElement) {
+                    setCursorPosition(e.target.selectionStart ?? 0);
+                  }
+                }}
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
               />
               <div className="pointer-events-none absolute inset-0 flex items-center px-3 font-mono text-lg">
-                {/* use pre instead of span to preserve whitespace */}
                 <pre className="m-0 whitespace-pre p-0 text-[16px] text-foreground">
-                  {form.state.values.input}
+                  {form.state.values.input.slice(0, cursorPosition)}
+                  {isFocused ? (
+                    <span className={cursorClassName}>
+                      {showCursor
+                        ? cursor
+                        : (form.state.values.input[cursorPosition] ?? "")}
+                    </span>
+                  ) : (
+                    (form.state.values.input[cursorPosition] ?? "")
+                  )}
+                  {form.state.values.input.slice(cursorPosition + 1)}
                 </pre>
-                {/* Show the cursor at the end of the text */}
-                {isFocused && <span className={cursorClassName}>{cursor}</span>}
               </div>
             </div>
             <ValidationErrors field={field} error={error} />

@@ -22,7 +22,8 @@ export function useCursorAnimation({
   }, [blinkInterval]);
 
   return {
-    cursor: showCursor ? cursorStyle : " ", // Space when not showing
-    cursorClassName: "text-primary", // Use primary color for better visibility
+    cursor: cursorStyle,
+    cursorClassName: "text-primary",
+    showCursor,
   };
 }
