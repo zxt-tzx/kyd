@@ -65,68 +65,69 @@ export function DevSearchInput() {
   };
 
   return (
-    <form
-      className="space-y-2"
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
-    >
-      <Label
-        htmlFor="github-username-input"
-        className="block text-left font-mono text-lg"
+    <div className="space-y-2">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
       >
-        Enter your dev&apos;s GitHub:
-      </Label>
+        <Label
+          htmlFor="github-username-input"
+          className="block text-left font-mono text-lg"
+        >
+          Enter your dev&apos;s GitHub:
+        </Label>
 
-      <form.Field
-        name="input"
-        children={(field) => (
-          <div className="grid gap-2">
-            <div className="relative">
-              <Input
-                ref={inputRef}
-                id="github-username-input"
-                type="text"
-                className="h-12 border border-primary font-mono text-lg text-transparent caret-transparent"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                onKeyUp={(e) => {
-                  if (e.target instanceof HTMLInputElement) {
-                    setCursorPosition(e.target.selectionStart ?? 0);
-                  }
-                }}
-                onClick={(e) => {
-                  if (e.target instanceof HTMLInputElement) {
-                    setCursorPosition(e.target.selectionStart ?? 0);
-                  }
-                }}
-                // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus
-              />
-              <div className="pointer-events-none absolute inset-0 flex items-center px-3 font-mono text-lg">
-                <pre className="m-0 whitespace-pre p-0 text-[16px] text-foreground">
-                  {form.state.values.input.slice(0, cursorPosition)}
-                  {isFocused ? (
-                    <span className={cursorClassName}>
-                      {showCursor
-                        ? cursor
-                        : (form.state.values.input[cursorPosition] ?? "")}
-                    </span>
-                  ) : (
-                    (form.state.values.input[cursorPosition] ?? "")
-                  )}
-                  {form.state.values.input.slice(cursorPosition + 1)}
-                </pre>
+        <form.Field
+          name="input"
+          children={(field) => (
+            <div className="grid gap-2">
+              <div className="relative">
+                <Input
+                  ref={inputRef}
+                  id="github-username-input"
+                  type="text"
+                  className="h-12 border border-primary font-mono text-lg text-transparent caret-transparent"
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
+                  onKeyUp={(e) => {
+                    if (e.target instanceof HTMLInputElement) {
+                      setCursorPosition(e.target.selectionStart ?? 0);
+                    }
+                  }}
+                  onClick={(e) => {
+                    if (e.target instanceof HTMLInputElement) {
+                      setCursorPosition(e.target.selectionStart ?? 0);
+                    }
+                  }}
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
+                />
+                <div className="pointer-events-none absolute inset-0 flex items-center px-3 font-mono text-lg">
+                  <pre className="m-0 whitespace-pre p-0 text-[16px] text-foreground">
+                    {form.state.values.input.slice(0, cursorPosition)}
+                    {isFocused ? (
+                      <span className={cursorClassName}>
+                        {showCursor
+                          ? cursor
+                          : (form.state.values.input[cursorPosition] ?? "")}
+                      </span>
+                    ) : (
+                      (form.state.values.input[cursorPosition] ?? "")
+                    )}
+                    {form.state.values.input.slice(cursorPosition + 1)}
+                  </pre>
+                </div>
               </div>
+              <ValidationErrors field={field} error={error} />
             </div>
-            <ValidationErrors field={field} error={error} />
-          </div>
-        )}
-      />
+          )}
+        />
+      </form>
 
       {isLoadingPreview && <UserPreviewSkeleton />}
 
@@ -144,7 +145,7 @@ export function DevSearchInput() {
           onCancel={handleCancel}
         />
       )}
-    </form>
+    </div>
   );
 }
 
