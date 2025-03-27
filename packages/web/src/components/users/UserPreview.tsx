@@ -1,6 +1,7 @@
 import {
   BuildingIcon,
   GlobeIcon,
+  InfoIcon,
   LoaderIcon,
   MailIcon,
   MapPinIcon,
@@ -70,10 +71,13 @@ export function UserPreview({
               <span className="text-muted-foreground">&nbsp;{name}</span>
             )}
           </div>
-          {bio && (
-            <p className="line-clamp-2 text-sm text-muted-foreground">{bio}</p>
-          )}
           <div className="flex flex-col gap-1 text-sm text-muted-foreground">
+            {bio && (
+              <div className="flex items-start gap-2">
+                <InfoIcon className="mt-0.5 size-4 shrink-0" />
+                <div className="text-left">{bio}</div>
+              </div>
+            )}
             {email && (
               <span className="flex items-center gap-2">
                 <MailIcon className="size-4" />
