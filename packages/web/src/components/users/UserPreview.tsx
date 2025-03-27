@@ -21,6 +21,7 @@ export type UserPreviewProps = {
   email: string | null;
   location: string | null;
   twitterUsername: string | null;
+  onCancel: () => void;
 } & {
   className?: string;
 };
@@ -35,6 +36,7 @@ export function UserPreview({
   email,
   location,
   twitterUsername,
+  onCancel,
   className,
 }: UserPreviewProps) {
   const researchDevMutation = useResearchDev();
@@ -47,13 +49,6 @@ export function UserPreview({
     >
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Is this your dev?</h2>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => researchDevMutation.mutate(login)}
-        >
-          Start research
-        </Button>
       </div>
       <div className="flex items-start gap-3">
         <img
@@ -110,6 +105,24 @@ export function UserPreview({
             )}
           </div>
         </div>
+      </div>
+      <div className="mt-6 grid grid-cols-2 gap-2">
+        <Button
+          variant="default"
+          size="sm"
+          className="w-full"
+          onClick={() => researchDevMutation.mutate(login)}
+        >
+          YES
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="w-full"
+          onClick={onCancel}
+        >
+          NO
+        </Button>
       </div>
     </div>
   );

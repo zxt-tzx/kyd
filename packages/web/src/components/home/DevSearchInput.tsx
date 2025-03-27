@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 
 import { githubUserSchema, type GitHubUser } from "@/core/github/schema.rest";
 import { githubUsernameSubmitSchema } from "@/core/github/schema.validation";
+import { useCursorAnimation } from "@/hooks/useCursorAnimation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,8 +11,6 @@ import {
   UserPreviewSkeleton,
 } from "@/components/users/UserPreview";
 import { ValidationErrors } from "@/components/ValidationErrors";
-
-import { useCursorAnimation } from "../../hooks/useCursorAnimation";
 
 export function DevSearchInput() {
   const [isFocused, setIsFocused] = useState(false);
@@ -51,6 +50,14 @@ export function DevSearchInput() {
     },
   });
 
+  const handleCancel = () => {
+    form.reset();
+    setPreview(null);
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  };
+
   return (
     <form
       className="space-y-2"
@@ -64,7 +71,7 @@ export function DevSearchInput() {
         htmlFor="github-username-input"
         className="block text-left font-mono text-lg"
       >
-        Enter your dev&apos;s GitHub username:
+        Enter your dev&apos;s GitHub:
       </Label>
 
       <form.Field
@@ -128,6 +135,7 @@ export function DevSearchInput() {
           location={preview.location}
           twitterUsername={preview.twitter_username}
           blog={preview.blog}
+          onCancel={handleCancel}
         />
       )}
     </form>
