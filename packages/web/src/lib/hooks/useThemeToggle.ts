@@ -1,4 +1,4 @@
-import { MonitorCogIcon, MoonIcon, SunIcon } from "lucide-react";
+import { MoonIcon, SunIcon, SunMoonIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useCallback } from "react";
 
@@ -12,7 +12,7 @@ export function useThemeToggle() {
   }, [theme, setTheme]);
 
   const ThemeIcon =
-    theme === "light" ? SunIcon : theme === "dark" ? MoonIcon : MonitorCogIcon;
+    theme === "light" ? SunIcon : theme === "dark" ? MoonIcon : SunMoonIcon;
 
   const themeText =
     theme === "light" ? "Light" : theme === "dark" ? "Dark" : "System";
