@@ -8,11 +8,12 @@ import {
   type ToolSet,
 } from "ai";
 import type { z } from "zod";
+
 import { APPROVAL } from "./shared";
 
 function isValidToolName<K extends PropertyKey, T extends object>(
   key: K,
-  obj: T
+  obj: T,
 ): key is K & keyof T {
   return key in obj;
 }
@@ -30,7 +31,6 @@ function isValidToolName<K extends PropertyKey, T extends object>(
 export async function processToolCalls<
   Tools extends ToolSet,
   ExecutableTools extends {
-    // biome-ignore lint/complexity/noBannedTypes: it's fine
     [Tool in keyof Tools as Tools[Tool] extends { execute: Function }
       ? never
       : Tool]: Tools[Tool];
@@ -46,7 +46,7 @@ export async function processToolCalls<
   executions: {
     [K in keyof Tools & keyof ExecutableTools]?: (
       args: z.infer<ExecutableTools[K]["parameters"]>,
-      context: ToolExecutionOptions
+      context: ToolExecutionOptions,
     ) => Promise<unknown>;
   };
 }): Promise<Message[]> {
@@ -99,7 +99,7 @@ export async function processToolCalls<
         formatDataStreamPart("tool_result", {
           toolCallId: toolInvocation.toolCallId,
           result,
-        })
+        }),
       );
 
       // Return updated toolInvocation with the actual result.
@@ -110,7 +110,7 @@ export async function processToolCalls<
           result,
         },
       };
-    })
+    }),
   );
 
   // Finally return the processed messages

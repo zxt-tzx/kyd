@@ -13,27 +13,19 @@ import {
 import { executions, tools } from "./tools";
 import { processToolCalls } from "./utils";
 
-// import { env } from "cloudflare:workers";
-
 const model = openai("gpt-4o-2024-11-20");
-// Cloudflare AI Gateway
-// const openai = createOpenAI({
-//   apiKey: env.OPENAI_API_KEY,
-//   baseURL: env.GATEWAY_BASE_URL,
-// });
 
 // we use ALS to expose the agent context to the tools
-export const agentContext = new AsyncLocalStorage<Chat>();
+export const agentContext = new AsyncLocalStorage<MyAgent>();
 /**
  * Chat Agent implementation that handles real-time AI chat interactions
  */
-export class Chat extends AIChatAgent<Env> {
+export class MyAgent extends AIChatAgent<Env> {
   /**
    * Handles incoming chat messages and manages the response stream
    * @param onFinish - Callback function executed when streaming completes
    */
 
-  // biome-ignore lint/complexity/noBannedTypes: <explanation>
   async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>) {
     // Create a streaming response that handles both text and tool outputs
     return agentContext.run(this, async () => {
@@ -94,6 +86,7 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
 
+    console.log("REACHED HERE, fix later");
     if (url.pathname === "/check-open-ai-key") {
       const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
       return Response.json({
@@ -107,7 +100,7 @@ export default {
     }
     return (
       // Route the request to our agent or return 404 if not found
-      (await routeAgentRequest(request, env)) ||
+      (await routeAgentRequest(request, env, { cors: true })) ||
       new Response("Not found", { status: 404 })
     );
   },

@@ -1,9 +1,10 @@
 {
   "name": "kyd-agent",
-  "main": "src/server.ts",
+    "main": "src/server.ts",
   "compatibility_date": "2025-03-14",
   "compatibility_flags": [
-    "nodejs_compat"
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env",
   ],
   "durable_objects": {
     "bindings": [
@@ -16,9 +17,7 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": [
-        "MyAgent"
-      ],
+      "new_sqlite_classes": ["MyAgent"],
     },
   ],
 }
