@@ -37,7 +37,7 @@
     "usehooks-ts": "^3.1.1"
   },
   "scripts": {
-    "dev": "vite --port=3001",
+    "dev": "vite",
     "build": "vite build",
     "serve": "vite preview",
     "start": "vite",
@@ -54,7 +54,7 @@
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.20",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9.12.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jsx-a11y": "^6.10.0",

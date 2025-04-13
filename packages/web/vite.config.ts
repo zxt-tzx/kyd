@@ -65,7 +65,7 @@ export default defineConfig({
   },
   server: {
     host: "local.kyd.theintel.io",
-    port: 3001,
+    port: 3000,
     https: {
       key: fs.readFileSync(
         // eslint-disable-next-line no-undef
