@@ -10,6 +10,7 @@ export default [
       "**/dist/**/*",
       "**/build/**/*",
       "packages/web/**/*",
+      "**/worker-configuration.d.ts",
     ],
   },
   {

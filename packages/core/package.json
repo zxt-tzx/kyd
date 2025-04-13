@@ -36,6 +36,6 @@
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
     "drizzle-kit": "^0.30.5",
-    "vitest": "^3.0.2"
+    "vitest": "*"
   }
 }

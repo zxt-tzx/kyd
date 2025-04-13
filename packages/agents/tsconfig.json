@@ -9,8 +9,15 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "isolatedModules": true /* Ensure that each file can be safely transpiled without relying on other imports. */,
+    "verbatimModuleSyntax": true /* Do not transform or elide any imports or exports not marked as type-only, ensuring they are written in the output file's format based on the 'module' setting. */,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     "types": [
-      "@cloudflare/workers-types"
+      "node",
+      "vite/client",
+      "./worker-configuration.d.ts"
     ],
     "paths": {
       "@/core/*": [
@@ -30,6 +37,7 @@
     "src/**/*"
   ],
   "exclude": [
-    "scripts/**/*"
+    "scripts/**/*",
+    "tests"
   ]
 }
