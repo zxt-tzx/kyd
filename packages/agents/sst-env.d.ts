@@ -3,44 +3,7 @@
 /* eslint-disable */
 /* deno-fmt-ignore-file */
 
-import "sst"
-declare module "sst" {
-  export interface Resource {
-    "Api": {
-      "type": "sst.aws.Router"
-      "url": string
-    }
-    "ApiFn": {
-      "name": string
-      "type": "sst.aws.Function"
-      "url": string
-    }
-    "BRAVE_API_KEY": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "DATABASE_URL": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "DEEPSEEK_API_KEY": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "OPENAI_API_KEY": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "SERPER_API_KEY": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "Web": {
-      "type": "sst.aws.StaticSite"
-      "url": string
-    }
-  }
-}
+/// <reference path="../../sst-env.d.ts" />
 
 import "sst"
 export {}

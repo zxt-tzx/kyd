@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "sst shell vitest",
-    "test:watch": "sst shell -- vitest watch",
+    "vitest": "vitest run --passWithNoTests",
+    "vitest:watch": "vitest watch",
     "typecheck": "tsc",
     "db": "sst shell drizzle-kit",
     "db:generate": "sst shell -- drizzle-kit generate",

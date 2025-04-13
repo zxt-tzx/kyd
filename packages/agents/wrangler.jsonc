@@ -1,19 +1,15 @@
 {
   "name": "kyd-agent",
   "main": "src/server.ts",
-  "compatibility_date": "2025-02-04",
+  "compatibility_date": "2025-03-14",
   "compatibility_flags": [
-    "nodejs_compat",
-    "nodejs_compat_populate_process_env",
+    "nodejs_compat"
   ],
-  "assets": {
-    "directory": "public",
-  },
   "durable_objects": {
     "bindings": [
       {
-        "name": "Chat",
-        "class_name": "Chat",
+        "name": "MyAgent",
+        "class_name": "MyAgent",
       },
     ],
   },
@@ -21,7 +17,7 @@
     {
       "tag": "v1",
       "new_sqlite_classes": [
-        "Chat"
+        "MyAgent"
       ],
     },
   ],

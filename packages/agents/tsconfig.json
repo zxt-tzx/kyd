@@ -1,11 +1,9 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
+  // "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
     "composite": true,
     "declaration": true,
     "declarationMap": true,
-    "outDir": "./dist",
-    "rootDir": ".",
     "module": "esnext",
     "moduleResolution": "bundler",
     "noUncheckedIndexedAccess": true,

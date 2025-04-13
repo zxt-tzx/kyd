@@ -34,7 +34,7 @@
       "devDependencies": {
         "@cloudflare/vite-plugin": "1.0.3",
         "@cloudflare/vitest-pool-workers": "^0.8.14",
-        "@cloudflare/workers-types": "^4.20250413.0",
+        "@types/node": "^22.10.1",
         "vite": "*",
         "vitest": "*",
         "wrangler": "^4.10.0",

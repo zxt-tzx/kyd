@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "dev": "sst dev",
+    "dev:agents": "bun --filter=@know-your-dev/agents dev",
     "sso": "aws sso login --sso-session theintel",
     "typecheck": "bun --filter=@know-your-dev/core typecheck && bun --filter=@know-your-dev/functions typecheck && bun --filter=@know-your-dev/scripts typecheck && bun --filter=@know-your-dev/web typecheck",
     "format:write": "prettier . --write",
@@ -19,7 +20,7 @@
     "secret:load:stg": "sst secret load .secrets.stg --stage stg",
     "secret:load:prod": "sst secret load .secrets.prod --stage prod",
     "script": "cd packages/scripts && bun run shell",
-    "check:all": "concurrently -g --prefix \"[{name}]\" --prefix-colors \"blue.bold,green.bold,yellow.bold,red.bold,magenta.bold\" --names \"typecheck,test,lint,format\" \"bun typecheck\" \"bun --filter=* test\" \"bun lint\" \"bun format:check\""
+    "check:all": "concurrently -g --prefix \"[{name}]\" --prefix-colors \"blue.bold,green.bold,yellow.bold,red.bold,magenta.bold\" --names \"typecheck,test,lint,format\" \"bun typecheck\" \"bun --filter=* vitest\" \"bun lint\" \"bun format:check\""
   },
   "overrides": {
     "vite": "6.2.6",
