@@ -12,6 +12,7 @@ interface Message {
   type: "incoming" | "outgoing";
 }
 
+
 export function Homepage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
@@ -19,7 +20,8 @@ export function Homepage() {
 
   const agent = useAgent({
     agent: "my-agent",
-    host: "http://localhost:5173",
+    // probably will need to modify this based on stage
+    host: "http://localhost:4141",
     onMessage: (message) => {
       const newMessage: Message = {
         id: Math.random().toString(36).substring(7),
@@ -54,7 +56,8 @@ export function Homepage() {
     try {
       const response = await agentFetch({
         agent: "my-agent",
-        host: "http://localhost:5173",
+        // probably will need to modify this based on stage
+        host: "http://localhost:4141",
       });
       const data = await response.text();
       const newMessage: Message = {

@@ -29,7 +29,7 @@ export const repoSchema = z
   })
   .strip();
 
-export const userEmailsSchema = z.array(
+export const authenticatedUserEmailsSchema = z.array(
   z.object({
     email: z.string(),
     primary: z.boolean(),

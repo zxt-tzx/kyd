@@ -22,4 +22,5 @@ export function createDb(config: {
   };
 }
 
-export type DbClient = ReturnType<typeof createDb>["db"];
+// TODO: Remove the cast once https://github.com/drizzle-team/drizzle-orm/issues/3175 is resolved
+export type DbClient = Omit<ReturnType<typeof createDb>["db"], "$client">;

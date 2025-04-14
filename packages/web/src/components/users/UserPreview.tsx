@@ -60,7 +60,7 @@ export function UserPreview({
           alt={login}
           className="size-10 rounded-full ring-1 ring-border"
         />
-        <div className="grid flex-1 gap-1.5">
+        <div className="grid flex-1 gap-1.5 text-left">
           <div className="flex items-center gap-1">
             <a
               href={`https://github.com/${login}`}
@@ -77,8 +77,8 @@ export function UserPreview({
           <div className="flex flex-col gap-1 text-sm text-muted-foreground">
             {bio && (
               <div className="flex items-start gap-2">
-                <InfoIcon className="mt-0.5 size-4 shrink-0" />
-                <div className="text-left">{bio}</div>
+                <InfoIcon className="size-4" />
+                {bio}
               </div>
             )}
             {email && (

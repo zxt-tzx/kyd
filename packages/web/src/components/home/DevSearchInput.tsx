@@ -1,8 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 
-import { githubUserSchema, type GitHubUser } from "@/core/github/schema.rest";
 import { githubUsernameSubmitSchema } from "@/core/github/schema.validation";
+import { fetchUser, IS_USER_MESSAGE, isUser } from "@/core/github/user";
 import { useCursorAnimation } from "@/hooks/useCursorAnimation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,10 +41,8 @@ export function DevSearchInput() {
         setError(null);
         setIsLoadingPreview(true);
         const user = await fetchUser(result.data);
-        if (user.type === "Organization") {
-          throw new Error(
-            "Please make sure this is not an organization account",
-          );
+        if (!isUser(user)) {
+          throw new Error(IS_USER_MESSAGE);
         }
         setPreview(user);
         // blur the input to dismiss the keyboard on mobile
@@ -149,19 +147,4 @@ export function DevSearchInput() {
       )}
     </div>
   );
-}
-
-async function fetchUser(username: string): Promise<GitHubUser> {
-  const response = await fetch(`https://api.github.com/users/${username}`);
-  if (!response.ok) {
-    throw new Error(
-      response.status === 404
-        ? "User not found"
-        : response.status === 403
-          ? "Rate limit exceeded. Please try again later."
-          : "Failed to fetch user",
-    );
-  }
-  const data = await response.json();
-  return githubUserSchema.parse(data);
 }

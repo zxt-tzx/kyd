@@ -1,13 +1,8 @@
-import { index, jsonb, pgTable, text } from "drizzle-orm/pg-core";
+import { index, pgTable, text } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+import type { z } from "zod";
 
 import { getBaseColumns } from "../base.sql";
-
-export type UserMetadata = {
-  company: string | null;
-  location: string | null;
-  bio: string | null;
-  emails: string[];
-};
 
 // each dev correlates to a Github user
 export const devs = pgTable(
@@ -17,10 +12,18 @@ export const devs = pgTable(
     nodeId: text("node_id").notNull().unique(),
     login: text("login").notNull(),
     name: text("name"),
-    email: text("email").notNull(), // not unique because users can change their emails. we track the underlying Github user using nodeId
+    email: text("email"),
     avatarUrl: text("avatar_url"),
     htmlUrl: text("html_url").notNull(),
-    metadata: jsonb("metadata").$type<UserMetadata>(),
+    company: text("company"),
+    location: text("location"),
+    bio: text("bio"),
   },
   (table) => [index("email_idx").on(table.email)],
 );
+
+export const insertDevSchema = createInsertSchema(devs).omit({
+  id: true,
+});
+
+export type InsertDev = z.infer<typeof insertDevSchema>;

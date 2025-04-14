@@ -9,6 +9,7 @@ export function timestamptz(name: string) {
 const prefixes = {
   users: "usr",
   devs: "dev",
+  queries: "qry",
 } as const;
 
 function createId(prefix: keyof typeof prefixes): string {
