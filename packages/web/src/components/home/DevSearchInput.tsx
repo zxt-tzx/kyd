@@ -76,7 +76,7 @@ export function DevSearchInput() {
         }}
       >
         <Label
-          htmlFor="github-username-input"
+          htmlFor="dev-github-user-input"
           className="block text-left font-mono text-lg"
         >
           Enter your dev&apos;s GitHub:
@@ -89,7 +89,7 @@ export function DevSearchInput() {
               <div className="relative">
                 <Input
                   ref={inputRef}
-                  id="github-username-input"
+                  id="dev-github-user-input"
                   type="text"
                   className="h-12 border border-primary font-mono text-lg text-transparent caret-transparent"
                   value={field.state.value}

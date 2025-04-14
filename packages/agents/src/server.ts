@@ -86,8 +86,7 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const url = new URL(request.url);
 
-    console.log("REACHED HERE, fix later");
-    if (url.pathname === "/check-open-ai-key") {
+    if (url.pathname === "/check-env") {
       const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
       return Response.json({
         success: hasOpenAIKey,
