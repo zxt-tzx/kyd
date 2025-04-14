@@ -4,13 +4,14 @@ import { devs } from "./db/schema/entities/dev.sql";
 import type { InsertQuery } from "./db/schema/entities/query.sql";
 import { queries } from "./db/schema/entities/query.sql";
 import { conflictUpdateOnly } from "./db/utils/conflict";
+import { nanoid } from "./util/nanoid";
 
 export async function createNewQuery({
   query,
   dev,
   db,
 }: {
-  query: Omit<InsertQuery, "devId">;
+  query: Omit<InsertQuery, "devId" | "urlId">;
   dev: InsertDev;
   db: DbClient;
 }) {
@@ -44,14 +45,15 @@ export async function createNewQuery({
       .insert(queries)
       .values({
         devId,
+        urlId: nanoid(),
         ...query,
       })
       .returning({
-        queryId: queries.id,
+        urlId: queries.urlId,
       });
   });
   if (!res) {
     throw new Error("Failed to create new query");
   }
-  return res.queryId;
+  return res.urlId;
 }

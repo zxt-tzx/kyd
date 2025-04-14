@@ -1,10 +1,10 @@
+import { createFileRoute } from "@tanstack/react-router";
 import { agentFetch } from "agents/client";
 import { useAgent } from "agents/react";
-import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useRef, useState } from "react";
 
-export const Route = createFileRoute("/query/$id")({
+export const Route = createFileRoute("/query/$urlId")({
   component: RouteComponent,
 });
 
@@ -19,7 +19,7 @@ function RouteComponent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { id } = Route.useParams();
+  const { urlId } = Route.useParams();
 
   const agent = useAgent({
     agent: "my-agent",
@@ -84,9 +84,9 @@ function RouteComponent() {
       <div className="mx-auto w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md">
         {/* Header with query ID */}
         <div className="border-b border-gray-200 bg-gray-50 p-3">
-          <h2 className="text-lg font-medium text-gray-700">Query: {id}</h2>
+          <h2 className="text-lg font-medium text-gray-700">Query: {urlId}</h2>
         </div>
-        
+
         {/* Status indicator */}
         <div className="flex items-center border-b border-gray-200 bg-gray-50 p-3">
           <div

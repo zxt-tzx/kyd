@@ -11,12 +11,12 @@ export const useResearchDev = () => {
 
   return useMutation({
     mutationFn: (username: string) => researchDev(username),
-    onSuccess: ({ message, data: { username, queryId } }) => {
+    onSuccess: ({ message, data: { username, urlId } }) => {
       toast({
         title: `Research on ${username} initiated`,
         description: message,
       });
-      navigate({ to: `/query/${queryId}` });
+      navigate({ to: `/query/${urlId}` });
     },
     onError: (error) => {
       console.error("Failed to research dev:", error);

@@ -12,7 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as QueryIdImport } from './routes/query/$id'
+import { Route as QueryUrlIdImport } from './routes/query/$urlId'
 
 // Create/Update Routes
 
@@ -22,9 +22,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const QueryIdRoute = QueryIdImport.update({
-  id: '/query/$id',
-  path: '/query/$id',
+const QueryUrlIdRoute = QueryUrlIdImport.update({
+  id: '/query/$urlId',
+  path: '/query/$urlId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,11 +39,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/query/$id': {
-      id: '/query/$id'
-      path: '/query/$id'
-      fullPath: '/query/$id'
-      preLoaderRoute: typeof QueryIdImport
+    '/query/$urlId': {
+      id: '/query/$urlId'
+      path: '/query/$urlId'
+      fullPath: '/query/$urlId'
+      preLoaderRoute: typeof QueryUrlIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -53,37 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/query/$id': typeof QueryIdRoute
+  '/query/$urlId': typeof QueryUrlIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/query/$id': typeof QueryIdRoute
+  '/query/$urlId': typeof QueryUrlIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/query/$id': typeof QueryIdRoute
+  '/query/$urlId': typeof QueryUrlIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/query/$id'
+  fullPaths: '/' | '/query/$urlId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/query/$id'
-  id: '__root__' | '/' | '/query/$id'
+  to: '/' | '/query/$urlId'
+  id: '__root__' | '/' | '/query/$urlId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  QueryIdRoute: typeof QueryIdRoute
+  QueryUrlIdRoute: typeof QueryUrlIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  QueryIdRoute: QueryIdRoute,
+  QueryUrlIdRoute: QueryUrlIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,14 +97,14 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/query/$id"
+        "/query/$urlId"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/query/$id": {
-      "filePath": "query/$id.tsx"
+    "/query/$urlId": {
+      "filePath": "query/$urlId.tsx"
     }
   }
 }

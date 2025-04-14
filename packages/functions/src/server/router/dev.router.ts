@@ -23,7 +23,7 @@ export const devRouter = new Hono<Context>().post(
       });
     }
     const { db } = getDeps();
-    const queryId = await createNewQuery({
+    const urlId = await createNewQuery({
       query: {
         prompt: "", // TODO: prompt
       },
@@ -43,7 +43,7 @@ export const devRouter = new Hono<Context>().post(
 
     return c.json(
       createSuccessResponse({
-        data: { username, queryId },
+        data: { username, urlId },
         message:
           "Please wait while our AI agents research this developer's GitHub activity.",
       }),
