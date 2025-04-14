@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
 
-import { newDevQuery } from "../api/dev";
+import { newDevQuery } from "../api/query";
 
 export const useNewQuery = () => {
   const { toast } = useToast();
