@@ -9,7 +9,7 @@
     "dev": "sst dev",
     "dev:agents": "bun --filter=@know-your-dev/agents dev",
     "sso": "aws sso login --sso-session theintel",
-    "typecheck": "bun --filter=@know-your-dev/core typecheck && bun --filter=@know-your-dev/functions typecheck && bun --filter=@know-your-dev/scripts typecheck && bun --filter=@know-your-dev/web typecheck",
+    "typecheck": "bun --filter=@know-your-dev/core typecheck && bun --filter=@know-your-dev/functions typecheck && bun --filter=@know-your-dev/scripts typecheck && bun --filter=@know-your-dev/web typecheck && bun --filter=@know-your-dev/agents typecheck",
     "format:write": "prettier . --write",
     "format:check": "prettier . --check || (echo '⚠️  Warning: Formatting issues found' && exit 0)",
     "lint": "eslint . && cd packages/web && eslint . || (echo '⚠️  Warning: Linting issues found' && exit 0)",

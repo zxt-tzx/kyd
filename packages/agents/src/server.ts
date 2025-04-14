@@ -1,6 +1,11 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { openai } from "@ai-sdk/openai";
-import { routeAgentRequest, type Schedule } from "agents";
+import {
+  routeAgentRequest,
+  type Connection,
+  type Schedule,
+  type WSMessage,
+} from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
 import { unstable_getSchedulePrompt } from "agents/schedule";
 import {
@@ -21,6 +26,42 @@ export const agentContext = new AsyncLocalStorage<MyAgent>();
  * Chat Agent implementation that handles real-time AI chat interactions
  */
 export class MyAgent extends AIChatAgent<Env> {
+  onConnect(connection: Connection) {
+    console.log("Client connected:", connection.id);
+    connection.send(`Welcome! You are connected with ID: ${connection.id}`);
+  }
+
+  onClose(connection: Connection) {
+    console.log("Client disconnected:", connection.id);
+  }
+
+  async onMessage(connection: Connection, message: WSMessage) {
+    console.log(`Message from client ${connection.id}:`, message);
+
+    // Echo the message back with a timestamp
+    const response = `Server received "${message}" at ${new Date().toLocaleTimeString()}`;
+    connection.send(response);
+    console.log("response sent to client:", response);
+
+    // Broadcast to other clients
+    for (const conn of this.getConnections()) {
+      if (conn.id !== connection.id) {
+        conn.send(`Client ${connection.id} says: ${message}`);
+      }
+    }
+  }
+
+  async onRequest(request: Request) {
+    const timestamp = new Date().toLocaleTimeString();
+    return new Response(
+      `Server time: ${timestamp} - Your request has been processed!`,
+      {
+        headers: {
+          "Content-Type": "text/plain",
+        },
+      },
+    );
+  }
   /**
    * Handles incoming chat messages and manages the response stream
    * @param onFinish - Callback function executed when streaming completes
