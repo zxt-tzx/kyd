@@ -1,21 +1,22 @@
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 
-// import { queryKeys } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 import { researchDev } from "../api/dev";
 
 export const useResearchDev = () => {
-  // const queryClient = useQueryClient();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   return useMutation({
     mutationFn: (username: string) => researchDev(username),
-    onSuccess: ({ message, data: { username } }) => {
+    onSuccess: ({ message, data: { username, queryId } }) => {
       toast({
         title: `Research on ${username} initiated`,
         description: message,
       });
+      navigate({ to: `/query/${queryId}` });
     },
     onError: (error) => {
       console.error("Failed to research dev:", error);

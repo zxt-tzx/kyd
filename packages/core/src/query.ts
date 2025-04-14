@@ -40,7 +40,7 @@ export async function createNewQuery({
       throw new Error("Failed to insert dev");
     }
     const { devId } = res;
-    return await db
+    return await tx
       .insert(queries)
       .values({
         devId,

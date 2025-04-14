@@ -1,9 +1,12 @@
 import { agentFetch } from "agents/client";
 import { useAgent } from "agents/react";
+import { createFileRoute } from "@tanstack/react-router";
 import type React from "react";
 import { useRef, useState } from "react";
 
-import { DevSearchInput } from "./home/DevSearchInput";
+export const Route = createFileRoute("/query/$id")({
+  component: RouteComponent,
+});
 
 interface Message {
   id: string;
@@ -12,11 +15,11 @@ interface Message {
   type: "incoming" | "outgoing";
 }
 
-
-export function Homepage() {
+function RouteComponent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { id } = Route.useParams();
 
   const agent = useAgent({
     agent: "my-agent",
@@ -75,17 +78,15 @@ export function Homepage() {
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
+
   return (
-    <div className="relative flex w-full justify-center pt-28">
-      <div className="w-full max-w-screen-xl px-4 text-center">
-        <h1 className="mb-8 font-mono text-5xl tracking-tight">
-          Know Your Dev
-        </h1>
-        <div className="mx-auto mb-8 max-w-md">
-          <DevSearchInput />
+    <div className="relative flex w-full justify-center pt-8">
+      <div className="mx-auto w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md">
+        {/* Header with query ID */}
+        <div className="border-b border-gray-200 bg-gray-50 p-3">
+          <h2 className="text-lg font-medium text-gray-700">Query: {id}</h2>
         </div>
-      </div>
-      <div className="mx-auto mt-8 w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md">
+        
         {/* Status indicator */}
         <div className="flex items-center border-b border-gray-200 bg-gray-50 p-3">
           <div
@@ -133,7 +134,7 @@ export function Homepage() {
           />
           <button
             type="submit"
-            className="rounded-r-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            className="rounded-r-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
           >
             Send
           </button>
@@ -144,7 +145,7 @@ export function Homepage() {
           <button
             type="button"
             onClick={handleFetchRequest}
-            className="w-full rounded bg-gray-200 px-4 py-2 font-medium text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
+            className="w-full rounded bg-gray-200 px-4 py-2 font-medium text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400/50"
           >
             Send HTTP Request
           </button>
