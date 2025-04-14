@@ -1,4 +1,4 @@
-import { useThemeToggle } from "@/lib/hooks/useThemeToggle";
+import { useThemeToggle } from "@/hooks/useThemeToggle";
 import { Button } from "@/components/ui/button";
 
 export function DarkModeToggle() {

@@ -7,7 +7,7 @@ import { devs } from "./dev.sql";
 
 export const queries = pgTable("queries", {
   ...getBaseColumns("queries"),
-  urlId: text("url_id").notNull(),
+  urlId: text("url_id").notNull().unique(),
   prompt: text("prompt").notNull(),
   devId: text("dev_id")
     .references(() => devs.id)

@@ -3,14 +3,14 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { useToast } from "@/hooks/use-toast";
 
-import { researchDev } from "../api/dev";
+import { newDevQuery } from "../api/dev";
 
-export const useResearchDev = () => {
+export const useNewQuery = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (username: string) => researchDev(username),
+    mutationFn: (username: string) => newDevQuery(username),
     onSuccess: ({ message, data: { username, urlId } }) => {
       toast({
         title: `Research on ${username} initiated`,

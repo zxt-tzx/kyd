@@ -5,7 +5,13 @@ import type React from "react";
 import { useRef, useState } from "react";
 
 export const Route = createFileRoute("/query/$urlId")({
-  component: RouteComponent,
+  component: AgentView,
+  // pendingComponent: <AgentViewSkeleton />,
+  // errorComponent: ({ error }) => {
+  // if (error instanceof ApiError && error.code === 404) {
+  //   return <NotFoundView />;
+  // }
+  // return <ErrorView />;
 });
 
 interface Message {
@@ -15,7 +21,7 @@ interface Message {
   type: "incoming" | "outgoing";
 }
 
-function RouteComponent() {
+function AgentView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);

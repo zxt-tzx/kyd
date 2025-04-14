@@ -8,7 +8,7 @@ import {
   MapPinIcon,
 } from "lucide-react";
 
-import { useResearchDev } from "@/lib/hooks/useDev";
+import { useNewQuery } from "@/lib/hooks/useAgentQuery";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { XTwitterIcon } from "@/components/icons/XTwitterIcon";
@@ -41,7 +41,7 @@ export function UserPreview({
   onCancel,
   className,
 }: UserPreviewProps) {
-  const researchDevMutation = useResearchDev();
+  const researchDevMutation = useNewQuery();
   const isLoading = researchDevMutation.isPending;
 
   return (

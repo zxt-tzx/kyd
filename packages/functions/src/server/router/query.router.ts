@@ -11,8 +11,8 @@ import type { Context } from "@/server/app";
 
 import { createSuccessResponse } from "../response";
 
-export const devRouter = new Hono<Context>().post(
-  "/research",
+export const queryRouter = new Hono<Context>().post(
+  "/",
   zValidator("json", z.object({ username: githubUsernameSchema })),
   async (c) => {
     const username = c.req.valid("json").username;
