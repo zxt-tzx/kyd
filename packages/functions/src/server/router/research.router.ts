@@ -1,6 +1,9 @@
 import { zValidator } from "@hono/zod-validator";
+import { agentFetch } from "agents/client";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
+import { Resource } from "sst";
 import { z } from "zod";
 
 import { eq } from "@/core/db";
@@ -51,6 +54,7 @@ export const researchRouter = new Hono<Context>()
         });
       }
       const { db } = getDeps();
+      const cloudflareSecretKey = Resource.Keys.cloudflareSecretKey;
       const nanoId = await createNewResearch({
         research: {
           prompt: "", // TODO: prompt
@@ -68,7 +72,25 @@ export const researchRouter = new Hono<Context>()
         },
         db,
       });
-
+      const response = await agentFetch(
+        {
+          agent: "dev-research-agent",
+          name: nanoId,
+          // probably will need to modify this based on stage
+          host: "http://localhost:4141",
+        },
+        {
+          headers: {
+            cloudflareSecretKey,
+          },
+        },
+      );
+      if (!response.ok) {
+        throw new HTTPException(response.status as ContentfulStatusCode, {
+          message: "Failed to call agent fetch",
+        });
+      }
+      console.log("called agent fetch successfully?");
       return c.json(
         createSuccessResponse({
           data: { username, nanoId },

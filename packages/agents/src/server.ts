@@ -138,10 +138,38 @@ export default {
         "OPENAI_API_KEY is not set, don't forget to set it locally in .dev.vars, and use `wrangler secret bulk .dev.vars` to upload it to production",
       );
     }
+    if (!process.env.CLOUDFLARE_SECRET_KEY) {
+      console.error(
+        "CLOUDFLARE_SECRET_KEY is not set, don't forget to set it locally in .dev.vars, and use `wrangler secret bulk .dev.vars` to upload it to production",
+      );
+    }
     return (
       // Route the request to our agent or return 404 if not found
-      (await routeAgentRequest(request, env, { cors: true })) ||
-      new Response("Not found", { status: 404 })
+      (await routeAgentRequest(request, env, {
+        cors: true,
+        onBeforeConnect: (connection) => {
+          // for websocket connection, future TODO: cookie auth?
+          // console.log("connection no auth required for now!!");
+          return connection;
+        },
+        onBeforeRequest: (request) => {
+          // Check if cloudflareSecretKey in headers matches process.env.CLOUDFLARE_SECRET_KEY
+          const cloudflareSecretKey = request.headers.get(
+            "cloudflareSecretKey",
+          );
+          if (
+            !cloudflareSecretKey ||
+            cloudflareSecretKey !== process.env.CLOUDFLARE_SECRET_KEY
+          ) {
+            return new Response("Unauthorized: Invalid cloudflareSecretKey", {
+              status: 401,
+            });
+          }
+          console.log("Authentication successful!");
+          return request;
+        },
+        // prefix: "dev-research-agent",
+      })) || new Response("Not found", { status: 404 })
     );
   },
 } satisfies ExportedHandler<Env>;

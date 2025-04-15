@@ -1,3 +1,14 @@
+const cloudflareSecretKey = new random.RandomString("CloudflareSecretKey", {
+  special: false,
+  length: 64,
+});
+
+const keys = new sst.Linkable("Keys", {
+  properties: {
+    cloudflareSecretKey: cloudflareSecretKey.result,
+  },
+});
+
 export const secret = {
   openaiApiKey: new sst.Secret("OPENAI_API_KEY"),
   deepseekApiKey: new sst.Secret("DEEPSEEK_API_KEY"),
@@ -8,6 +19,7 @@ export const secret = {
   // OR pay extra to use the IPv4 address
   // alternatively, move to AWS RDS / RDS Aurora
   databaseUrl: new sst.Secret("DATABASE_URL"),
+  keys,
 };
 
 export const allSecrets = Object.values(secret);

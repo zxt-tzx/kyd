@@ -26,6 +26,10 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "Keys": {
+      "cloudflareSecretKey": string
+      "type": "sst.sst.Linkable"
+    }
     "OPENAI_API_KEY": {
       "type": "sst.sst.Secret"
       "value": string

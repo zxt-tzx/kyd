@@ -69,10 +69,10 @@ function NotFoundView() {
     <div className="relative flex w-full justify-center pt-28">
       <div className="w-full max-w-screen-xl px-4 text-center">
         <h1 className="mb-8 font-mono text-5xl tracking-tight">
-          Query Not Found
+          Research Not Found
         </h1>
         <p className="mb-8 text-xl text-gray-600">
-          The query you&apos;re looking for doesn&apos;t exist or has been
+          The research you&apos;re looking for doesn&apos;t exist or has been
           removed.
         </p>
         <a
@@ -123,7 +123,7 @@ function AgentView() {
 
   const agent = useAgent({
     agent: "dev-research-agent",
-    name: nanoId,
+    // name: nanoId,
     // probably will need to modify this based on stage
     host: "http://localhost:4141",
     onMessage: (message) => {
@@ -159,7 +159,8 @@ function AgentView() {
   const handleFetchRequest = async () => {
     try {
       const response = await agentFetch({
-        agent: "my-agent",
+        agent: "dev-research-agent",
+        name: nanoId,
         // probably will need to modify this based on stage
         host: "http://localhost:4141",
       });
@@ -183,9 +184,11 @@ function AgentView() {
   return (
     <div className="relative flex w-full justify-center pt-8">
       <div className="mx-auto w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md">
-        {/* Header with query ID */}
+        {/* Header with research ID */}
         <div className="border-b border-gray-200 bg-gray-50 p-3">
-          <h2 className="text-lg font-medium text-gray-700">Query: {nanoId}</h2>
+          <h2 className="text-lg font-medium text-gray-700">
+            Research: {nanoId}
+          </h2>
         </div>
 
         {/* Status indicator */}
