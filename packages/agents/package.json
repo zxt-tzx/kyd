@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc",
     "build": "vite build",
     "dev": "vite dev",
     "deploy": "vite build && wrangler deploy",

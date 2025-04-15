@@ -2,13 +2,11 @@
  * Tool definitions for the AI chat agent
  * Tools can either require human confirmation or execute automatically
  */
+import { unstable_scheduleSchema } from "agents/schedule";
 import { tool } from "ai";
 import { z } from "zod";
 
 import { agentContext } from "./server";
-import {
-  unstable_scheduleSchema,
-} from "agents/schedule";
 
 /**
  * Weather information tool that requires human confirmation
