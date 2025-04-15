@@ -4,7 +4,11 @@ import { useAgent } from "agents/react";
 import type React from "react";
 import { useRef, useState } from "react";
 
-import { type AgentState } from "@/core/agent/shared";
+import {
+  getAgentClientFetchOpts,
+  type AgentState,
+  type Message,
+} from "@/core/agent/shared";
 import { ApiError } from "@/lib/api/client";
 
 export const Route = createFileRoute("/research/$nanoId")({
@@ -17,13 +21,6 @@ export const Route = createFileRoute("/research/$nanoId")({
     return <ErrorView error={error} />;
   },
 });
-
-interface Message {
-  id: string;
-  text: string;
-  timestamp: Date;
-  type: "incoming" | "outgoing";
-}
 
 function AgentViewSkeleton() {
   return (
@@ -128,11 +125,7 @@ function AgentView() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const agent = useAgent({
-    // TODO: extract to core
-    agent: "dev-research-agent",
-    name: nanoId,
-    // probably will need to modify this based on stage
-    host: "http://localhost:4141",
+    ...getAgentClientFetchOpts(nanoId),
     onMessage: (message) => {
       const newMessage: Message = {
         id: Math.random().toString(36).substring(7),
@@ -169,13 +162,7 @@ function AgentView() {
 
   const handleFetchRequest = async () => {
     try {
-      const response = await agentFetch({
-        // TODO: extract to core
-        agent: "dev-research-agent",
-        name: nanoId,
-        // probably will need to modify this based on stage
-        host: "http://localhost:4141",
-      });
+      const response = await agentFetch(getAgentClientFetchOpts(nanoId));
       const data = await response.text();
       const newMessage: Message = {
         id: Math.random().toString(36).substring(7),

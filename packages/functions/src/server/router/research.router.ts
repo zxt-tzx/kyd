@@ -6,6 +6,7 @@ import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { Resource } from "sst";
 import { z } from "zod";
 
+import { getAgentClientFetchOpts } from "@/core/agent/shared";
 import { eq } from "@/core/db";
 import { researches } from "@/core/db/schema/entities/research.sql";
 import { githubUsernameSchema } from "@/core/github/schema.validation";
@@ -75,13 +76,8 @@ export const researchRouter = new Hono<Context>()
       });
       // TODO: wrap this in db transaction?
       const response = await agentFetch(
-        // TODO: extract to core
-        {
-          agent: "dev-research-agent",
-          name: nanoId,
-          // probably will need to modify this based on stage
-          host: "http://localhost:4141",
-        },
+        // Using shared configuration function
+        getAgentClientFetchOpts(nanoId),
         {
           headers: {
             cloudflareSecretKey,
