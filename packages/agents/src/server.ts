@@ -20,15 +20,30 @@ import { processToolCalls } from "./utils";
 
 const model = openai("gpt-4o-2024-11-20");
 
-// we use ALS to expose the agent context to the tools
+interface State {
+  status: "inactive" | "running" | "complete";
+  initialPrompt: string;
+  steps: Array<{
+    title: string;
+    thoughts: string;
+    context: string;
+  }>;
+}
+
+// we use async local storage to expose the agent context to the tools
 export const agentContext = new AsyncLocalStorage<DevResearchAgent>();
 /**
  * Chat Agent implementation that handles real-time AI chat interactions
  */
-export class DevResearchAgent extends AIChatAgent<Env> {
+export class DevResearchAgent extends AIChatAgent<Env, State> {
+  initialState: State = {
+    status: "inactive",
+    initialPrompt: "",
+    steps: [],
+  };
   onConnect(connection: Connection) {
     console.log("Client connected:", connection.id);
-    connection.send(`Welcome! You are connected with ID: ${connection.id}`);
+    // connection.send(`Welcome! You are connected with ID: ${connection.id}`);
   }
 
   onClose(connection: Connection) {
@@ -39,19 +54,40 @@ export class DevResearchAgent extends AIChatAgent<Env> {
     console.log(`Message from client ${connection.id}:`, message);
 
     // Echo the message back with a timestamp
-    const response = `Server received "${message}" at ${new Date().toLocaleTimeString()}`;
-    connection.send(response);
-    console.log("response sent to client:", response);
+    // const response = `Server received "${message}" at ${new Date().toLocaleTimeString()}`;
+    // connection.send(response);
+    // console.log("response sent to client:", response);
 
     // Broadcast to other clients
-    for (const conn of this.getConnections()) {
-      if (conn.id !== connection.id) {
-        conn.send(`Client ${connection.id} says: ${message}`);
-      }
-    }
+    // for (const conn of this.getConnections()) {
+    //   if (conn.id !== connection.id) {
+    //     conn.send(`Client ${connection.id} says: ${message}`);
+    //   }
+    // }
   }
 
   async onRequest(request: Request) {
+    const action = request.headers.get("action");
+    const prompt = request.headers.get("prompt");
+    if (action === "initialize" && prompt) {
+      this.setState({
+        status: "running",
+        initialPrompt: prompt,
+        steps: [],
+      });
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Agent initialized successfully",
+          status: "running",
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    }
     const timestamp = new Date().toLocaleTimeString();
     return new Response(
       `Server time: ${timestamp} - Your request has been processed!`,
@@ -125,27 +161,10 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
  */
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
-    const url = new URL(request.url);
-
-    if (url.pathname === "/check-env") {
-      const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
-      return Response.json({
-        success: hasOpenAIKey,
-      });
-    }
-    if (!process.env.OPENAI_API_KEY) {
-      console.error(
-        "OPENAI_API_KEY is not set, don't forget to set it locally in .dev.vars, and use `wrangler secret bulk .dev.vars` to upload it to production",
-      );
-    }
-    if (!process.env.CLOUDFLARE_SECRET_KEY) {
-      console.error(
-        "CLOUDFLARE_SECRET_KEY is not set, don't forget to set it locally in .dev.vars, and use `wrangler secret bulk .dev.vars` to upload it to production",
-      );
-    }
     return (
       // Route the request to our agent or return 404 if not found
       (await routeAgentRequest(request, env, {
+        // prefix: "dev-research-agent",
         cors: true,
         onBeforeConnect: (connection) => {
           // for websocket connection, future TODO: cookie auth?
@@ -161,14 +180,12 @@ export default {
             !cloudflareSecretKey ||
             cloudflareSecretKey !== process.env.CLOUDFLARE_SECRET_KEY
           ) {
-            return new Response("Unauthorized: Invalid cloudflareSecretKey", {
+            return new Response("Unauthorized", {
               status: 401,
             });
           }
-          console.log("Authentication successful!");
           return request;
         },
-        // prefix: "dev-research-agent",
       })) || new Response("Not found", { status: 404 })
     );
   },

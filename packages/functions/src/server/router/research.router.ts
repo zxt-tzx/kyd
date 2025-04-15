@@ -53,11 +53,12 @@ export const researchRouter = new Hono<Context>()
           message: IS_USER_MESSAGE,
         });
       }
+      const prompt = "this is your initial prompt";
       const { db } = getDeps();
       const cloudflareSecretKey = Resource.Keys.cloudflareSecretKey;
       const nanoId = await createNewResearch({
         research: {
-          prompt: "", // TODO: prompt
+          prompt,
         },
         dev: {
           nodeId: user.node_id,
@@ -72,7 +73,9 @@ export const researchRouter = new Hono<Context>()
         },
         db,
       });
+      // TODO: wrap this in db transaction?
       const response = await agentFetch(
+        // TODO: extract to core
         {
           agent: "dev-research-agent",
           name: nanoId,
@@ -82,6 +85,8 @@ export const researchRouter = new Hono<Context>()
         {
           headers: {
             cloudflareSecretKey,
+            action: "initialize",
+            prompt,
           },
         },
       );
@@ -90,7 +95,6 @@ export const researchRouter = new Hono<Context>()
           message: "Failed to call agent fetch",
         });
       }
-      console.log("called agent fetch successfully?");
       return c.json(
         createSuccessResponse({
           data: { username, nanoId },
