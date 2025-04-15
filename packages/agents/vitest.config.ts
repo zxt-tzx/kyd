@@ -1,4 +1,5 @@
 import { defineWorkersConfig } from "@cloudflare/vitest-pool-workers/config";
+import { resolve } from "path";
 
 export default defineWorkersConfig({
   test: {
@@ -8,4 +9,10 @@ export default defineWorkersConfig({
       },
     },
   },
+  resolve: {
+    alias: {
+      "@/core": resolve(__dirname, "../core/src"),
+      "@": resolve(__dirname, "./src")
+    }
+  }
 });
