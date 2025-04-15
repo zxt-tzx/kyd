@@ -1,17 +1,17 @@
 import type { DbClient } from "./db";
 import type { InsertDev } from "./db/schema/entities/dev.sql";
 import { devs } from "./db/schema/entities/dev.sql";
-import type { InsertQuery } from "./db/schema/entities/query.sql";
-import { queries } from "./db/schema/entities/query.sql";
+import type { InsertResearch } from "./db/schema/entities/research.sql";
+import { researches } from "./db/schema/entities/research.sql";
 import { conflictUpdateOnly } from "./db/utils/conflict";
 import { nanoid } from "./util/nanoid";
 
-export async function createNewQuery({
-  query,
+export async function createNewResearch({
+  research,
   dev,
   db,
 }: {
-  query: Omit<InsertQuery, "devId" | "urlId">;
+  research: Omit<InsertResearch, "devId" | "nanoId">;
   dev: InsertDev;
   db: DbClient;
 }) {
@@ -42,18 +42,18 @@ export async function createNewQuery({
     }
     const { devId } = res;
     return await tx
-      .insert(queries)
+      .insert(researches)
       .values({
         devId,
-        urlId: nanoid(),
-        ...query,
+        nanoId: nanoid(),
+        ...research,
       })
       .returning({
-        urlId: queries.urlId,
+        nanoId: researches.nanoId,
       });
   });
   if (!res) {
-    throw new Error("Failed to create new query");
+    throw new Error("Failed to create new research");
   }
-  return res.urlId;
+  return res.nanoId;
 }

@@ -4,37 +4,37 @@ import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 
 import { eq } from "@/core/db";
-import { queries } from "@/core/db/schema/entities/query.sql";
+import { researches } from "@/core/db/schema/entities/research.sql";
 import { githubUsernameSchema } from "@/core/github/schema.validation";
 import { fetchUser, IS_USER_MESSAGE, isUser } from "@/core/github/user";
-import { createNewQuery } from "@/core/query";
+import { createNewResearch } from "@/core/research";
 import { getDeps } from "@/deps";
 import type { Context } from "@/server/app";
 
 import { createSuccessResponse } from "../response";
 
-export const queryRouter = new Hono<Context>()
-  .get("/:urlId", async (c) => {
-    const { urlId } = c.req.param();
+export const researchRouter = new Hono<Context>()
+  .get("/:nanoId", async (c) => {
+    const { nanoId } = c.req.param();
     const { db } = getDeps();
-    const [query] = await db
+    const [research] = await db
       .select({
-        id: queries.id,
-        urlId: queries.urlId,
-        prompt: queries.prompt,
-        devId: queries.devId,
+        id: researches.id,
+        nanoId: researches.nanoId,
+        prompt: researches.prompt,
+        devId: researches.devId,
       })
-      .from(queries)
-      .where(eq(queries.urlId, urlId));
-    if (!query) {
+      .from(researches)
+      .where(eq(researches.nanoId, nanoId));
+    if (!research) {
       throw new HTTPException(404, {
-        message: "Query not found",
+        message: "Research not found",
       });
     }
     return c.json(
       createSuccessResponse({
-        data: { query },
-        message: "Query fetched successfully",
+        data: { research },
+        message: "Research fetched successfully",
       }),
     );
   })
@@ -51,8 +51,8 @@ export const queryRouter = new Hono<Context>()
         });
       }
       const { db } = getDeps();
-      const urlId = await createNewQuery({
-        query: {
+      const nanoId = await createNewResearch({
+        research: {
           prompt: "", // TODO: prompt
         },
         dev: {
@@ -71,7 +71,7 @@ export const queryRouter = new Hono<Context>()
 
       return c.json(
         createSuccessResponse({
-          data: { username, urlId },
+          data: { username, nanoId },
           message:
             "Please wait while our AI agents research this developer's GitHub activity.",
         }),

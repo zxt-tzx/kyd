@@ -12,7 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
-import { Route as QueryUrlIdImport } from './routes/query/$urlId'
+import { Route as ResearchNanoIdImport } from './routes/research/$nanoId'
 
 // Create/Update Routes
 
@@ -22,9 +22,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const QueryUrlIdRoute = QueryUrlIdImport.update({
-  id: '/query/$urlId',
-  path: '/query/$urlId',
+const ResearchNanoIdRoute = ResearchNanoIdImport.update({
+  id: '/research/$nanoId',
+  path: '/research/$nanoId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -39,11 +39,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/query/$urlId': {
-      id: '/query/$urlId'
-      path: '/query/$urlId'
-      fullPath: '/query/$urlId'
-      preLoaderRoute: typeof QueryUrlIdImport
+    '/research/$nanoId': {
+      id: '/research/$nanoId'
+      path: '/research/$nanoId'
+      fullPath: '/research/$nanoId'
+      preLoaderRoute: typeof ResearchNanoIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -53,37 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/query/$urlId': typeof QueryUrlIdRoute
+  '/research/$nanoId': typeof ResearchNanoIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/query/$urlId': typeof QueryUrlIdRoute
+  '/research/$nanoId': typeof ResearchNanoIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/query/$urlId': typeof QueryUrlIdRoute
+  '/research/$nanoId': typeof ResearchNanoIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/query/$urlId'
+  fullPaths: '/' | '/research/$nanoId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/query/$urlId'
-  id: '__root__' | '/' | '/query/$urlId'
+  to: '/' | '/research/$nanoId'
+  id: '__root__' | '/' | '/research/$nanoId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  QueryUrlIdRoute: typeof QueryUrlIdRoute
+  ResearchNanoIdRoute: typeof ResearchNanoIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  QueryUrlIdRoute: QueryUrlIdRoute,
+  ResearchNanoIdRoute: ResearchNanoIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,14 +97,14 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/query/$urlId"
+        "/research/$nanoId"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/query/$urlId": {
-      "filePath": "query/$urlId.tsx"
+    "/research/$nanoId": {
+      "filePath": "research/$nanoId.tsx"
     }
   }
 }

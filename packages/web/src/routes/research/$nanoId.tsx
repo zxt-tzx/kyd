@@ -4,10 +4,10 @@ import { useAgent } from "agents/react";
 import type React from "react";
 import { useRef, useState } from "react";
 
-import { useAgentView } from "@/lib/hooks/useAgentView";
 import { ApiError } from "@/lib/api/client";
+import { useAgentView } from "@/lib/hooks/useAgentView";
 
-export const Route = createFileRoute("/query/$urlId")({
+export const Route = createFileRoute("/research/$nanoId")({
   component: AgentView,
   pendingComponent: () => <AgentViewSkeleton />,
   errorComponent: ({ error }: { error: unknown }) => {
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/query/$urlId")({
       return <NotFoundView />;
     }
     return <ErrorView error={error} />;
-  }
+  },
 });
 
 interface Message {
@@ -87,7 +87,8 @@ function NotFoundView() {
 }
 
 function ErrorView({ error }: { error: unknown }) {
-  const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+  const errorMessage =
+    error instanceof Error ? error.message : "An unknown error occurred";
 
   return (
     <div className="relative flex w-full justify-center pt-28">
@@ -115,8 +116,8 @@ function ErrorView({ error }: { error: unknown }) {
 }
 
 function AgentView() {
-  const { urlId } = Route.useParams();
-  const { data: query } = useAgentView(urlId);
+  const { nanoId } = Route.useParams();
+  const { data: query } = useAgentView(nanoId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -185,7 +186,7 @@ function AgentView() {
       <div className="mx-auto w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md">
         {/* Header with query ID */}
         <div className="border-b border-gray-200 bg-gray-50 p-3">
-          <h2 className="text-lg font-medium text-gray-700">Query: {urlId}</h2>
+          <h2 className="text-lg font-medium text-gray-700">Query: {nanoId}</h2>
         </div>
 
         {/* Status indicator */}
