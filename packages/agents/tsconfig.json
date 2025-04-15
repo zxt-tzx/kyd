@@ -13,7 +13,6 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "noEmit": true,
     "types": ["node", "vite/client", "./worker-configuration.d.ts"],
     "paths": {
       "@/core/*": ["../core/src/*"],

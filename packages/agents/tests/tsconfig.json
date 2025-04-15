@@ -3,6 +3,7 @@
   "compilerOptions": {
     "types": ["../worker-configuration.d.ts", "@cloudflare/vitest-pool-workers"]
   },
+  "references": [{ "path": ".." }],
   "include": ["./**/*.ts"],
   "exclude": ["../src"]
 }
