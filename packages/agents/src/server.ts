@@ -21,11 +21,11 @@ import { processToolCalls } from "./utils";
 const model = openai("gpt-4o-2024-11-20");
 
 // we use ALS to expose the agent context to the tools
-export const agentContext = new AsyncLocalStorage<MyAgent>();
+export const agentContext = new AsyncLocalStorage<DevResearchAgent>();
 /**
  * Chat Agent implementation that handles real-time AI chat interactions
  */
-export class MyAgent extends AIChatAgent<Env> {
+export class DevResearchAgent extends AIChatAgent<Env> {
   onConnect(connection: Connection) {
     console.log("Client connected:", connection.id);
     connection.send(`Welcome! You are connected with ID: ${connection.id}`);

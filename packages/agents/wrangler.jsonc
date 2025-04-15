@@ -9,15 +9,15 @@
   "durable_objects": {
     "bindings": [
       {
-        "name": "MyAgent",
-        "class_name": "MyAgent",
+        "name": "DevResearchAgent",
+        "class_name": "DevResearchAgent",
       },
     ],
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["MyAgent"],
+      "new_sqlite_classes": ["DevResearchAgent"],
     },
   ],
 }

@@ -5,7 +5,6 @@ import type React from "react";
 import { useRef, useState } from "react";
 
 import { ApiError } from "@/lib/api/client";
-import { useAgentView } from "@/lib/hooks/useAgentView";
 
 export const Route = createFileRoute("/research/$nanoId")({
   component: AgentView,
@@ -73,7 +72,8 @@ function NotFoundView() {
           Query Not Found
         </h1>
         <p className="mb-8 text-xl text-gray-600">
-          The query you're looking for doesn't exist or has been removed.
+          The query you&apos;re looking for doesn&apos;t exist or has been
+          removed.
         </p>
         <a
           href="/"
@@ -117,14 +117,13 @@ function ErrorView({ error }: { error: unknown }) {
 
 function AgentView() {
   const { nanoId } = Route.useParams();
-  const { data: query } = useAgentView(nanoId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const agent = useAgent({
-    agent: "my-agent",
-    // name
+    agent: "dev-research-agent",
+    name: nanoId,
     // probably will need to modify this based on stage
     host: "http://localhost:4141",
     onMessage: (message) => {
