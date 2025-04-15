@@ -11,6 +11,7 @@ interface RouterContext {
 }
 
 const TanStackRouterDevtools =
+  // eslint-disable-next-line no-undef
   process.env.NODE_ENV === "production"
     ? () => null // Render nothing in production
     : React.lazy(() =>

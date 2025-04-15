@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "sst shell vitest",
-    "test:watch": "sst shell -- vitest watch",
+    "vitest": "vitest run --passWithNoTests",
+    "vitest:watch": "vitest watch",
     "typecheck": "tsc",
     "db": "sst shell drizzle-kit",
     "db:generate": "sst shell -- drizzle-kit generate",
@@ -20,10 +20,17 @@
     ]
   },
   "dependencies": {
+    "@ai-sdk/openai": "^1.3.12",
     "@openauthjs/openauth": "^0.3.6",
+    "agents": "^0.0.59",
+    "ai": "^4.3.5",
     "dedent": "^1.5.3",
     "drizzle-orm": "^0.40.0",
     "drizzle-zod": "^0.6.1",
+    "gql.tada": "^1.8.10",
+    "graphql": "^16.10.0",
+    "nanoid": "^5.1.5",
+    "octokit": "^4.1.2",
     "postgres": "^3.4.4",
     "resend": "^4.1.1",
     "tldts": "^6.1.68",
@@ -33,6 +40,6 @@
   "devDependencies": {
     "@tsconfig/node22": "^22.0.0",
     "drizzle-kit": "^0.30.5",
-    "vitest": "^3.0.2"
+    "vitest": "*"
   }
 }

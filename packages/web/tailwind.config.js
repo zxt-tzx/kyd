@@ -12,6 +12,9 @@ export default {
         "2xl": "1400px",
       },
     },
+    fontFamily: {
+      mono: ["Menlo", "Monaco", "Courier New", "monospace"],
+    },
     extend: {
       colors: {
         "primary-dark": "hsl(var(--primary-dark))",

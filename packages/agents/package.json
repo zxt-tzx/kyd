@@ -1,0 +1,25 @@
+{
+  "name": "@know-your-dev/agents",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "vite build",
+    "dev": "vite dev",
+    "deploy": "vite build && wrangler deploy",
+    "vitest": "vitest run",
+    "types": "wrangler types"
+  },
+  "dependencies": {
+    "@know-your-dev/core": "workspace:*",
+    "zod": "*"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.0.3",
+    "@cloudflare/vitest-pool-workers": "^0.8.14",
+    "@types/node": "^22.10.1",
+    "vite": "*",
+    "vitest": "*",
+    "wrangler": "^4.10.0"
+  }
+}

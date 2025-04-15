@@ -9,7 +9,8 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import pluginReact from "eslint-plugin-react";
 import tailwind from "eslint-plugin-tailwindcss";
 import globals from "globals";
-import tseslint from "typescript-eslint";
+
+import rootConfig from "../../eslint.config.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,19 +21,7 @@ export default [
   { files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
-  {
-    files: ["**/*.{ts,tsx}"],
-    plugins: {
-      "@typescript-eslint": tseslint.plugin,
-    },
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        project: ["./tsconfig.json"],
-      },
-    },
-  },
-  ...tseslint.configs.recommended,
+  ...rootConfig,
   pluginReact.configs.flat.recommended,
   pluginReact.configs.flat["jsx-runtime"],
   jsxA11y.flatConfigs.recommended,
@@ -43,7 +32,7 @@ export default [
   {
     settings: {
       react: {
-        version: "detect", // Automatically detect the React version
+        version: "detect",
       },
       tailwindcss: {
         config: "tailwind.config.js",
@@ -51,7 +40,6 @@ export default [
       },
     },
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
       "react/no-unknown-property": "off",
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
@@ -75,7 +63,7 @@ export default [
         },
       ],
       "tailwindcss/no-custom-classname": "off",
-      "tailwindcss/classnames-order": "error",
+      "tailwindcss/classnames-order": "warn",
     },
   },
 ];

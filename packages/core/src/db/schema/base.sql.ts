@@ -8,7 +8,8 @@ export function timestamptz(name: string) {
 // comprehensive list of all tables
 const prefixes = {
   users: "usr",
-  repos: "rep",
+  devs: "dev",
+  researches: "rsc",
 } as const;
 
 function createId(prefix: keyof typeof prefixes): string {

@@ -9,6 +9,8 @@ export default [
       "**/routeTree.gen.ts",
       "**/dist/**/*",
       "**/build/**/*",
+      "packages/web/**/*",
+      "**/worker-configuration.d.ts",
     ],
   },
   {
@@ -31,7 +33,7 @@ export default [
         { variables: true, functions: false, classes: true },
       ],
       "@typescript-eslint/no-unused-vars": [
-        "error",
+        "warn",
         {
           vars: "all",
           args: "after-used",

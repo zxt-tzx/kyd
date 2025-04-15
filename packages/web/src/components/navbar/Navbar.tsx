@@ -1,22 +1,22 @@
 import { Link } from "@tanstack/react-router";
-import { RadarIcon } from "lucide-react";
+import { UserSearchIcon } from "lucide-react";
 
 import { DarkModeToggle } from "@/components/navbar/DarkModeToggle";
 
 export function Navbar() {
   const standardLogo = (
     <div className="flex items-center gap-2">
-      <RadarIcon className="size-6 text-gray-600 dark:text-gray-400" />
-      <span className="text-gray-600 dark:text-gray-400">Know Your Dev</span>
+      <UserSearchIcon className="size-6 text-primary" />
+      <span className="text-primary">KYD</span>
     </div>
   );
   const lightModeLogo = (
-    <h1 className="flex items-center font-serif text-2xl dark:hidden">
+    <h1 className="flex items-center font-mono text-2xl dark:hidden">
       {standardLogo}
     </h1>
   );
   const darkModeLogo = (
-    <h1 className="hidden items-center font-serif text-2xl dark:flex">
+    <h1 className="hidden items-center font-mono text-2xl dark:flex">
       {standardLogo}
     </h1>
   );

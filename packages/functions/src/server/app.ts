@@ -5,7 +5,7 @@ import { logger } from "hono/logger";
 import { Resource } from "sst";
 
 import type { ErrorResponse } from "./response";
-import { dummyRouter } from "./router/dummy.router";
+import { researchRouter } from "./router/research.router";
 
 export interface Context extends Env {
   // Variables: {
@@ -37,7 +37,7 @@ app.get("/", async (c) => {
 const _routes = app
   // Create the base app with /api prefix
   .basePath("/api")
-  .route("/dummy", dummyRouter);
+  .route("/research", researchRouter);
 // Protected user-specific routes
 // .use("/me/*", authMiddleware) // Apply middleware to all /me routes
 

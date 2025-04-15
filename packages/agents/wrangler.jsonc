@@ -1,0 +1,23 @@
+{
+  "name": "kyd-agent",
+  "main": "src/server.ts",
+  "compatibility_date": "2025-03-14",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "nodejs_compat_populate_process_env",
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "DevResearchAgent",
+        "class_name": "DevResearchAgent",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["DevResearchAgent"],
+    },
+  ],
+}

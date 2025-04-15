@@ -1,3 +1,5 @@
+import type React from "react";
+
 import { Navbar } from "@/components/navbar/Navbar";
 
 export function Layout({ children }: { children: React.ReactNode }) {
