@@ -15,20 +15,15 @@ import {
   type StreamTextOnFinishCallback,
 } from "ai";
 
+import { type AgentState } from "@/core/agent/shared";
+
 import { executions, tools } from "./tools";
 import { processToolCalls } from "./utils";
 
 const model = openai("gpt-4o-2024-11-20");
 
-interface State {
-  status: "inactive" | "running" | "complete";
-  initialPrompt: string;
-  steps: Array<{
-    title: string;
-    thoughts: string;
-    context: string;
-  }>;
-}
+// Use the shared AgentState interface
+type State = AgentState;
 
 // we use async local storage to expose the agent context to the tools
 export const agentContext = new AsyncLocalStorage<DevResearchAgent>();

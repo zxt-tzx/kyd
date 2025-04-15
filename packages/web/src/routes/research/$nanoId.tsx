@@ -4,6 +4,7 @@ import { useAgent } from "agents/react";
 import type React from "react";
 import { useRef, useState } from "react";
 
+import { type AgentState } from "@/core/agent/shared";
 import { ApiError } from "@/lib/api/client";
 
 export const Route = createFileRoute("/research/$nanoId")({
@@ -22,16 +23,6 @@ interface Message {
   text: string;
   timestamp: Date;
   type: "incoming" | "outgoing";
-}
-
-interface AgentState {
-  status: "inactive" | "running" | "complete";
-  initialPrompt: string;
-  steps: Array<{
-    title: string;
-    thoughts: string;
-    context: string;
-  }>;
 }
 
 function AgentViewSkeleton() {
