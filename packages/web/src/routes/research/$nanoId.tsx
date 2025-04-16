@@ -142,7 +142,6 @@ function AgentView() {
       };
       setMessages((prev) => [...prev, newMessage]);
     },
-    startClosed: true,
     onOpen: () => {
       setIsConnected(true);
       setIsLoading(false);

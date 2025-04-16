@@ -40,6 +40,7 @@ export default [
       },
     },
     rules: {
+      "no-unused-vars": "warn",
       "react/no-unknown-property": "off",
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
