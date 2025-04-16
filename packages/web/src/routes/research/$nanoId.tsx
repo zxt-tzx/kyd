@@ -11,6 +11,8 @@ import {
 } from "@/core/agent/shared";
 import { ApiError } from "@/lib/api/client";
 
+const sstStage = import.meta.env.VITE_SST_STAGE;
+
 export const Route = createFileRoute("/research/$nanoId")({
   component: AgentView,
   pendingComponent: () => <AgentViewSkeleton />,
@@ -125,7 +127,10 @@ function AgentView() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const agent = useAgent({
-    ...getAgentClientFetchOpts(nanoId),
+    ...getAgentClientFetchOpts({
+      nanoId,
+      stage: sstStage,
+    }),
     onMessage: (message) => {
       const newMessage: Message = {
         id: Math.random().toString(36).substring(7),
@@ -162,7 +167,12 @@ function AgentView() {
 
   const handleFetchRequest = async () => {
     try {
-      const response = await agentFetch(getAgentClientFetchOpts(nanoId));
+      const response = await agentFetch(
+        getAgentClientFetchOpts({
+          nanoId,
+          stage: sstStage,
+        }),
+      );
       const data = await response.text();
       const newMessage: Message = {
         id: Math.random().toString(36).substring(7),

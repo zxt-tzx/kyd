@@ -77,7 +77,7 @@ export const researchRouter = new Hono<Context>()
       // TODO: wrap this in db transaction?
       const response = await agentFetch(
         // Using shared configuration function
-        getAgentClientFetchOpts(nanoId),
+        getAgentClientFetchOpts({ nanoId, stage: Resource.App.stage }),
         {
           headers: {
             cloudflareSecretKey,

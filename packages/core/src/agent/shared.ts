@@ -25,13 +25,9 @@ export interface Message {
 }
 
 /**
- * Agent configuration type
- */
-
-/**
  * Environment stage type
  */
-export type Stage = "local" | "stg" | "prod";
+export type Stage = "stg" | "prod" | (string & {});
 
 /**
  * Get agent configuration based on nanoId and stage
@@ -39,24 +35,24 @@ export type Stage = "local" | "stg" | "prod";
  * @param stage - The environment stage (local, dev, staging, prod)
  * @returns The agent configuration object
  */
-export function getAgentClientFetchOpts(
-  nanoId: string,
-  stage: Stage = "local",
-) {
+export function getAgentClientFetchOpts({
+  nanoId,
+  stage = "local",
+}: {
+  nanoId: string;
+  stage: Stage;
+}) {
   // Default agent name
   const agent = "dev-research-agent";
 
   // Determine host based on stage
   let host: string;
   switch (stage) {
-    case "local":
-      host = "http://localhost:4141";
-      break;
     case "stg":
-      host = "https://dev-agent.example.com";
+      host = "https://kyd-agent-stg.theintel.io";
       break;
     case "prod":
-      host = "https://agent.example.com";
+      host = "https://kyd-agent.theintel.io";
       break;
     default:
       host = "http://localhost:4141";

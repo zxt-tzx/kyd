@@ -38,7 +38,13 @@
       "vars": {
         "ENVIRONMENT": "staging",
         "DEBUG_MODE": "true"
-      }
+      },
+      "routes": [
+        {
+          "pattern": "kyd-agent-stg.theintel.io",
+          "custom_domain": true
+        }
+      ]
     },
     "prod": {
       "name": "kyd-agent-prod",
@@ -53,7 +59,13 @@
       "vars": {
         "ENVIRONMENT": "production",
         "DEBUG_MODE": "false"
-      }
+      },
+      "routes": [
+        {
+          "pattern": "kyd-agent.theintel.io",
+          "custom_domain": true
+        }
+      ]
     }
   }
 }
