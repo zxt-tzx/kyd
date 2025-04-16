@@ -22,16 +22,13 @@ import { processToolCalls } from "./utils";
 
 const model = openai("gpt-4o-2024-11-20");
 
-// Use the shared AgentState interface
-type State = AgentState;
-
 // we use async local storage to expose the agent context to the tools
 export const agentContext = new AsyncLocalStorage<DevResearchAgent>();
 /**
  * Chat Agent implementation that handles real-time AI chat interactions
  */
-export class DevResearchAgent extends AIChatAgent<Env, State> {
-  initialState: State = {
+export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
+  initialState: AgentState = {
     status: "inactive",
     initialPrompt: "",
     steps: [],
@@ -85,7 +82,7 @@ export class DevResearchAgent extends AIChatAgent<Env, State> {
     }
     const timestamp = new Date().toLocaleTimeString();
     return new Response(
-      `Server time: ${timestamp} - Your request has been processed!`,
+      `Server time: ${timestamp} - We received your request!`,
       {
         headers: {
           "Content-Type": "text/plain",
@@ -173,7 +170,7 @@ export default {
           );
           if (
             !cloudflareSecretKey ||
-            cloudflareSecretKey !== process.env.CLOUDFLARE_SECRET_KEY
+            cloudflareSecretKey !== env.CLOUDFLARE_SECRET_KEY
           ) {
             return new Response("Unauthorized", {
               status: 401,

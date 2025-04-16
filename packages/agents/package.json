@@ -6,7 +6,10 @@
     "typecheck": "tsc --noEmit",
     "build": "vite build",
     "dev": "vite dev",
-    "deploy": "vite build && wrangler deploy",
+    "deploy:stg": "vite build --mode stg && wrangler deploy",
+    "deploy:prod": "vite build --mode prod && wrangler deploy",
+    "secret:stg": "wrangler secret bulk .dev.vars.stg --env stg",
+    "secret:prod": "wrangler secret bulk .dev.vars.prod --env prod",
     "vitest": "vitest run",
     "types": "wrangler types"
   },

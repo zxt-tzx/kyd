@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [cloudflare()],
   resolve: {
     alias: {
+      "@/core": path.resolve(__dirname, "../core/src"),
       "@": path.resolve(__dirname, "./src"),
     },
   },
