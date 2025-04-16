@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ApiError } from "@/lib/api/client";
 import { ResearchResult } from "@/components/result/ResearchResult";
 import {
+  ErrorMessageView,
   ErrorView,
   NotFoundView,
   ResearchResultSkeleton,
@@ -21,18 +22,26 @@ export const Route = createFileRoute("/research/$nanoId")({
 
 function AgentView() {
   const { nanoId } = Route.useParams();
-  const result = ResearchResult({ nanoId });
+  const { isLoading, isConnected, errorMessage, agentState, component } =
+    ResearchResult({
+      nanoId,
+    });
 
   // Show loading screen while connecting to websocket
-  if (result.isLoading) {
+  if (isLoading) {
     return <ResearchResultSkeleton />;
   }
 
+  // Show ErrorMessageView if there's an error message
+  if (errorMessage !== null || !isConnected) {
+    return <ErrorMessageView message={errorMessage} />;
+  }
+
   // Show NotFoundView if connected but agent is inactive
-  if (result.isConnected && result.agentState.status === "inactive") {
+  if (isConnected && agentState.status === "inactive") {
     return <NotFoundView />;
   }
 
   // Return the main component
-  return result.component;
+  return component;
 }

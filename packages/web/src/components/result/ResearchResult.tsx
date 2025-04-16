@@ -19,7 +19,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [agentState, setAgentState] = useState<AgentState>({
     status: "inactive",
     initialPrompt: "",
@@ -44,16 +44,20 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
     onOpen: () => {
       setIsConnected(true);
       setIsLoading(false);
+      setErrorMessage(null);
     },
     onClose: () => setIsConnected(false),
-    onError: () => {
-      setIsError(true);
+    onError: (event) => {
+      const message =
+        event instanceof ErrorEvent ? event.message : "Something went wrong";
+      setErrorMessage(message);
       setIsLoading(false);
     },
     onStateUpdate: (newState: AgentState) => {
       // Type assertion to ensure compatibility with our state type
       setAgentState(newState);
       setIsLoading(false);
+      setErrorMessage(null);
     },
   });
 
@@ -102,7 +106,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
   // Return loading, error and component state alongside the JSX
   return {
     isLoading,
-    isError,
+    errorMessage,
     isConnected,
     agentState,
     component: (
