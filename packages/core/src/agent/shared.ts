@@ -46,6 +46,7 @@ export function getAgentClientFetchOpts({
   const agent = "dev-research-agent";
 
   // Determine host based on stage
+  console.log({ stage });
   let host: string;
   switch (stage) {
     case "stg":

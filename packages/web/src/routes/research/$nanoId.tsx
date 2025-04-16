@@ -119,6 +119,8 @@ function AgentView() {
   const { nanoId } = Route.useParams();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [agentState, setAgentState] = useState<AgentState>({
     status: "inactive",
     initialPrompt: "",
@@ -140,11 +142,20 @@ function AgentView() {
       };
       setMessages((prev) => [...prev, newMessage]);
     },
-    onOpen: () => setIsConnected(true),
+    startClosed: true,
+    onOpen: () => {
+      setIsConnected(true);
+      setIsLoading(false);
+    },
     onClose: () => setIsConnected(false),
+    onError: () => {
+      setIsError(true);
+      setIsLoading(false);
+    },
     onStateUpdate: (newState: AgentState) => {
       // Type assertion to ensure compatibility with our state type
       setAgentState(newState);
+      setIsLoading(false);
     },
   });
 
@@ -190,6 +201,20 @@ function AgentView() {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  console.log({
+    isLoading,
+    isConnected,
+  });
+  // Show loading screen while connecting to websocket
+  if (isLoading) {
+    return <AgentViewSkeleton />;
+  }
+
+  // Show NotFoundView if connected but agent is inactive
+  if (isConnected && agentState.status === "inactive") {
+    return <NotFoundView />;
+  }
+
   return (
     <div className="relative flex w-full justify-center pt-8">
       <div className="mx-auto w-full max-w-md overflow-hidden rounded-lg border border-gray-200 bg-white shadow-md">
@@ -200,7 +225,7 @@ function AgentView() {
           </h2>
         </div>
 
-        {/* Status indicator */}
+        {/* Status indicator - always visible, independent of loading state */}
         <div className="flex items-center border-b border-gray-200 bg-gray-50 p-3">
           <div
             className={`mr-2 size-3 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`}
@@ -211,29 +236,27 @@ function AgentView() {
         </div>
 
         {/* Agent Status and Prompt */}
-        {isConnected && (
-          <div className="border-b border-gray-200 bg-gray-50 p-3">
-            <div className="mb-2">
-              <span className="font-medium text-gray-700">Status: </span>
-              <span
-                className={`${agentState.status === "running" ? "text-green-600" : agentState.status === "complete" ? "text-blue-600" : "text-gray-600"} text-sm`}
-              >
-                {agentState.status.charAt(0).toUpperCase() +
-                  agentState.status.slice(1)}
-              </span>
-            </div>
-            {agentState.initialPrompt && (
-              <div>
-                <span className="font-medium text-gray-700">
-                  Initial Prompt:{" "}
-                </span>
-                <p className="mt-1 break-words text-sm text-gray-600">
-                  {agentState.initialPrompt}
-                </p>
-              </div>
-            )}
+        <div className="border-b border-gray-200 bg-gray-50 p-3">
+          <div className="mb-2">
+            <span className="font-medium text-gray-700">Status: </span>
+            <span
+              className={`${agentState.status === "running" ? "text-green-600" : agentState.status === "complete" ? "text-blue-600" : "text-gray-600"} text-sm`}
+            >
+              {agentState.status.charAt(0).toUpperCase() +
+                agentState.status.slice(1)}
+            </span>
           </div>
-        )}
+          {agentState.initialPrompt && (
+            <div>
+              <span className="font-medium text-gray-700">
+                Initial Prompt:{" "}
+              </span>
+              <p className="mt-1 break-words text-sm text-gray-600">
+                {agentState.initialPrompt}
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Messages section */}
         <div className="h-64 overflow-y-auto bg-gray-50 p-4">
