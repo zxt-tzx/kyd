@@ -38,8 +38,6 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
     initialPrompt: "",
     steps: [],
   });
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [startTime, setStartTime] = useState<Date | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const agent = useAgent({
@@ -69,15 +67,9 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
       setIsLoading(false);
     },
     onStateUpdate: (newState: AgentState) => {
-      // Type assertion to ensure compatibility with our state type
       setAgentState(newState);
       setIsLoading(false);
       setErrorMessage(null);
-
-      // Set start time when agent starts running
-      if (newState.status === "running" && !startTime) {
-        setStartTime(new Date());
-      }
     },
   });
 
@@ -123,25 +115,6 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
-  // Calculate elapsed time since research started
-  useEffect(() => {
-    let intervalId: ReturnType<typeof setInterval>;
-
-    if (agentState.status === "running" && startTime) {
-      intervalId = setInterval(() => {
-        const now = new Date();
-        const elapsed = Math.floor(
-          (now.getTime() - startTime.getTime()) / 1000,
-        );
-        setElapsedTime(elapsed);
-      }, 1000);
-    }
-
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [agentState.status, startTime]);
-
   // Helper function to get title text based on agent status
   const getTitleText = () => {
     switch (agentState.status) {
@@ -156,6 +129,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
     }
   };
 
+  const elapsedTime = 0;
   // Helper function to get subtitle text based on agent status
   const getSubtitleText = () => {
     switch (agentState.status) {
@@ -164,9 +138,9 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
       case "running":
         return `Time since research started: ${elapsedTime} seconds.`;
       case "complete":
-        return `Research completed in ${elapsedTime} seconds.`;
+        return "Here is what we know about your dev:";
       default:
-        return "";
+        agentState.status satisfies never;
     }
   };
 
@@ -187,26 +161,22 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
           {/* Connection status indicator */}
           <div className="mb-8 flex items-center justify-center">
             <div
-              className={`mr-2 size-3 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`}
+              className={`mr-2 size-3 rounded-full ${
+                isLoading
+                  ? "bg-amber-500"
+                  : isConnected
+                    ? "bg-green-500"
+                    : "bg-red-500"
+              }`}
             />
             <span className="text-sm text-gray-600">
-              {isConnected ? "Connected to server" : "Disconnected"}
+              {isLoading
+                ? "Connecting..."
+                : isConnected
+                  ? "Connected to server"
+                  : "Disconnected"}
             </span>
           </div>
-
-          {/* Initial Prompt */}
-          {agentState.initialPrompt && (
-            <Card className="mx-auto mb-8 max-w-2xl">
-              <CardHeader>
-                <CardTitle>Initial Research Prompt</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-left text-gray-700">
-                  {agentState.initialPrompt}
-                </p>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Research Steps */}
           {agentState.steps.length > 0 && (
