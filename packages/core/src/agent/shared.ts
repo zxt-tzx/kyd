@@ -1,24 +1,31 @@
-type AgentStatus = "inactive" | "running" | "complete";
+import { z } from "zod";
 
-interface AgentInitInfo {
-  initiatedAt: Date;
-  title: string;
-  initialPrompt: string;
-  scratchpad: string;
-}
-export type AgentState =
-  | {
-      status: "inactive";
-    }
-  | {
-      status: Exclude<AgentStatus, "inactive">;
-      initInfo: AgentInitInfo;
-      steps: Array<{
-        title: string;
-        thoughts: string;
-        context: string;
-      }>;
-    };
+export const AgentInitInfoSchema = z.object({
+  initiatedAt: z.coerce.date(),
+  title: z.string(),
+  initialPrompt: z.string(),
+  scratchpad: z.string(),
+});
+
+export const AgentStepSchema = z.object({
+  title: z.string(),
+  thoughts: z.string(),
+  context: z.string(),
+});
+
+export const AgentStateSchema = z.union([
+  z.object({ status: z.literal("inactive") }),
+  z.object({
+    status: z.union([z.literal("running"), z.literal("complete")]),
+    initInfo: AgentInitInfoSchema,
+    steps: z.array(AgentStepSchema),
+  }),
+]);
+
+export type AgentInitInfo = z.infer<typeof AgentInitInfoSchema>;
+export type AgentStep = z.infer<typeof AgentStepSchema>;
+export type AgentState = z.infer<typeof AgentStateSchema>;
+
 
 /**
  * Environment stage type

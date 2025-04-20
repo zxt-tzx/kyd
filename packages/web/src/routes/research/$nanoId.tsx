@@ -22,7 +22,7 @@ export const Route = createFileRoute("/research/$nanoId")({
 
 function AgentView() {
   const { nanoId } = Route.useParams();
-  const { isLoading, isConnected, errorMessage, agentState, component } =
+  const { isLoading, isConnected, errorMessage, agentStatus, component } =
     ResearchResult({
       nanoId,
     });
@@ -38,7 +38,7 @@ function AgentView() {
   }
 
   // Show NotFoundView if connected but agent is inactive
-  if (isConnected && agentState.status === "inactive") {
+  if (isConnected && agentStatus === "inactive") {
     return <NotFoundView />;
   }
 

@@ -32,29 +32,27 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     status: "inactive",
   };
   onConnect(connection: Connection) {
-    console.log("Client connected:", connection.id);
+    console.log("Client connected:", this.name);
     // connection.send(`Welcome! You are connected with ID: ${connection.id}`);
   }
 
   onClose(connection: Connection) {
-    console.log("Client disconnected:", connection.id);
-  }
-
-  async onMessage(connection: Connection, message: WSMessage) {
-    console.log(`Message from client ${connection.id}:`, message);
+    console.log("Client disconnected:", this.name);
   }
 
   async onRequest(request: Request) {
     const action = request.headers.get("action");
     const prompt = request.headers.get("prompt");
     if (action === "initialize" && prompt) {
+      const name = this.name;
       this.setState({
         status: "running",
         initInfo: {
           initialPrompt: prompt,
           initiatedAt: new Date(),
-          scratchpad: "",
-          title: "",
+          scratchpad:
+            "Use this scratchpad to save information relating to the research. We will use all the information in this scratchpad to generate a writeup at the end.",
+          title: `Research Agent #${name}`,
         },
         steps: [],
       });
