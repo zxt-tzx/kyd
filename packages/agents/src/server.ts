@@ -1,11 +1,6 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { openai } from "@ai-sdk/openai";
-import {
-  routeAgentRequest,
-  type Connection,
-  type Schedule,
-  type WSMessage,
-} from "agents";
+import { routeAgentRequest, type Connection, type Schedule } from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
 import { unstable_getSchedulePrompt } from "agents/schedule";
 import {
@@ -47,7 +42,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
       const name = this.name;
       this.setState({
         status: "running",
-        initInfo: {
+        agentInfo: {
           initialPrompt: prompt,
           initiatedAt: new Date(),
           scratchpad:

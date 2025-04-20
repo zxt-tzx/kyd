@@ -1,33 +1,80 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import type React from "react";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function ResearchResultSkeleton() {
+export function ResearchResultView({
+  isLoading,
+  errorMessage,
+  isConnected,
+  agentStatus,
+  component,
+}: {
+  isLoading: boolean;
+  errorMessage: string | null;
+  isConnected: boolean;
+  agentStatus: string;
+  component: React.ReactNode;
+}) {
+  // Prioritize error, then loading, then agent status/component
+  if (errorMessage) {
+    return <ErrorMessageView message={errorMessage} />;
+  }
+  if (isLoading) {
+    return (
+      <ResearchResultSkeleton isLoading={isLoading} isConnected={isConnected} />
+    );
+  }
+  if (agentStatus === "inactive") {
+    return <NotFoundView />;
+  }
+  // Otherwise, show the main component
+  return component;
+}
+
+export function ResearchResultSkeleton({
+  isLoading = true,
+  isConnected = false,
+}: {
+  isLoading?: boolean;
+  isConnected?: boolean;
+}) {
   return (
     <div className="relative flex w-full justify-center pt-28">
       <div className="w-full max-w-screen-xl px-4 text-center">
-        <h1 className="mb-8 font-mono text-5xl tracking-tight">Loading Research</h1>
+        <h1 className="mb-8 font-mono text-5xl tracking-tight">
+          Loading Research
+        </h1>
         <h2 className="mb-8 text-xl text-gray-600">
           <Skeleton className="mx-auto h-6 w-64" />
         </h2>
-        
+
         {/* Connection status indicator */}
         <div className="mb-8 flex items-center justify-center">
-          <div className="mr-2 size-3 rounded-full bg-gray-300" />
+          <div
+            className={`mr-2 size-3 rounded-full ${
+              isLoading
+                ? "bg-amber-500"
+                : isConnected
+                  ? "bg-green-500"
+                  : "bg-red-500"
+            }`}
+          />
           <span className="text-sm text-gray-600">
-            Connecting...
+            {isLoading
+              ? "Connecting..."
+              : isConnected
+                ? "Connected to server"
+                : "Disconnected"}
           </span>
         </div>
-        
-        {/* Initial Prompt Skeleton */}
-        <Card className="mx-auto mb-8 max-w-2xl">
-          <CardHeader>
-            <CardTitle>Initial Research Prompt</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Skeleton className="h-20 w-full" />
-          </CardContent>
-        </Card>
-        
+
         {/* Research Steps Skeleton */}
         <div className="mx-auto mb-8 max-w-3xl">
           <h3 className="mb-4 text-2xl font-semibold">Research Steps</h3>
@@ -45,29 +92,6 @@ export function ResearchResultSkeleton() {
             </CardHeader>
             <CardContent>
               <Skeleton className="h-24 w-full" />
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Messages Skeleton */}
-        <div className="mx-auto mb-8 max-w-2xl">
-          <Card>
-            <CardHeader>
-              <CardTitle>Messages</CardTitle>
-              <CardDescription>
-                Communication with the research agent
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="max-h-96 overflow-y-auto">
-                <Skeleton className="h-32 w-full" />
-              </div>
-              
-              {/* Message form skeleton */}
-              <div className="mt-4 flex">
-                <Skeleton className="h-10 flex-1 rounded-l-md" />
-                <Skeleton className="h-10 w-20 rounded-r-md" />
-              </div>
             </CardContent>
           </Card>
         </div>

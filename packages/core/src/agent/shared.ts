@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const AgentInitInfoSchema = z.object({
+export const AgentInfo = z.object({
   initiatedAt: z.coerce.date(),
   title: z.string(),
   initialPrompt: z.string(),
@@ -17,15 +17,14 @@ export const AgentStateSchema = z.union([
   z.object({ status: z.literal("inactive") }),
   z.object({
     status: z.union([z.literal("running"), z.literal("complete")]),
-    initInfo: AgentInitInfoSchema,
+    agentInfo: AgentInfo,
     steps: z.array(AgentStepSchema),
   }),
 ]);
 
-export type AgentInitInfo = z.infer<typeof AgentInitInfoSchema>;
+export type AgentInfo = z.infer<typeof AgentInfo>;
 export type AgentStep = z.infer<typeof AgentStepSchema>;
 export type AgentState = z.infer<typeof AgentStateSchema>;
-
 
 /**
  * Environment stage type

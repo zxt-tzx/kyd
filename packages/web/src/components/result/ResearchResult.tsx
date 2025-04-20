@@ -51,12 +51,15 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
       setIsLoading(false);
     },
     onStateUpdate: (newState: unknown) => {
+      console.log({ newState });
       const result = AgentStateSchema.safeParse(newState);
       if (result.success) {
         setAgentState(result.data);
         setErrorMessage(null);
       } else {
-        setErrorMessage("Agent state validation failed");
+        setErrorMessage(
+          `Agent state validation failed: ${result.error.message}`,
+        );
         // Optionally log result.error for debugging
       }
       setIsLoading(false);
@@ -73,14 +76,18 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
         <div className="w-full max-w-screen-xl px-4 text-center">
           {/* Render based on agentState.status */}
           {agentState.status === "inactive" && <InactiveAgentResult />}
-          {agentState.status === "running" && agentState.initInfo && (
+          {agentState.status === "running" && (
             <RunningAgentResult
-              initiatedAt={agentState.initInfo.initiatedAt}
+              title={agentState.agentInfo.title}
+              initiatedAt={agentState.agentInfo.initiatedAt}
               steps={agentState.steps}
             />
           )}
           {agentState.status === "complete" && (
-            <CompleteAgentResult steps={agentState.steps} />
+            <CompleteAgentResult
+              title={agentState.agentInfo.title}
+              steps={agentState.steps}
+            />
           )}
 
           {/* Connection status indicator */}
@@ -120,9 +127,11 @@ function InactiveAgentResult() {
 }
 
 function RunningAgentResult({
+  title,
   initiatedAt,
   steps,
 }: {
+  title: string;
   initiatedAt: string | number | Date;
   steps: Array<{ title: string; thoughts: string; context: string }>;
 }) {
@@ -141,9 +150,7 @@ function RunningAgentResult({
 
   return (
     <>
-      <h1 className="mb-8 font-mono text-5xl tracking-tight">
-        Running Research…
-      </h1>
+      <h1 className="mb-8 font-mono text-5xl tracking-tight">{title}</h1>
       <h2 className="mb-8 text-xl text-gray-600">
         Time since research started: {elapsedTime} seconds.
       </h2>
@@ -153,15 +160,15 @@ function RunningAgentResult({
 }
 
 function CompleteAgentResult({
+  title,
   steps,
 }: {
+  title: string;
   steps: Array<{ title: string; thoughts: string; context: string }>;
 }) {
   return (
     <>
-      <h1 className="mb-8 font-mono text-5xl tracking-tight">
-        Research Complete
-      </h1>
+      <h1 className="mb-8 font-mono text-5xl tracking-tight">{title}</h1>
       <h2 className="mb-8 text-xl text-gray-600">
         Here is what we know about your dev
       </h2>
