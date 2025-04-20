@@ -1,13 +1,7 @@
-import { agentFetch } from "agents/client";
 import { useAgent } from "agents/react";
-import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
-import {
-  getAgentClientFetchOpts,
-  type AgentState,
-  type Message,
-} from "@/core/agent/shared";
+import { getAgentClientFetchOpts, type AgentState } from "@/core/agent/shared";
 import {
   Accordion,
   AccordionContent,
@@ -29,14 +23,11 @@ interface ResearchResultProps {
 const sstStage = import.meta.env.VITE_SST_STAGE;
 
 export function ResearchResult({ nanoId }: ResearchResultProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [agentState, setAgentState] = useState<AgentState>({
     status: "inactive",
-    initialPrompt: "",
-    steps: [],
   });
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -45,15 +36,6 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
       nanoId,
       stage: sstStage,
     }),
-    onMessage: (message) => {
-      const newMessage: Message = {
-        id: Math.random().toString(36).substring(7),
-        text: message.data as string,
-        timestamp: new Date(),
-        type: "incoming",
-      };
-      setMessages((prev) => [...prev, newMessage]);
-    },
     onOpen: () => {
       setIsConnected(true);
       setIsLoading(false);
@@ -72,44 +54,6 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
       setErrorMessage(null);
     },
   });
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!inputRef.current || !inputRef.current.value.trim()) return;
-
-    const text = inputRef.current.value;
-    const newMessage: Message = {
-      id: Math.random().toString(36).substring(7),
-      text,
-      timestamp: new Date(),
-      type: "outgoing",
-    };
-
-    agent.send(text);
-    setMessages((prev) => [...prev, newMessage]);
-    inputRef.current.value = "";
-  };
-
-  const handleFetchRequest = async () => {
-    try {
-      const response = await agentFetch(
-        getAgentClientFetchOpts({
-          nanoId,
-          stage: sstStage,
-        }),
-      );
-      const data = await response.text();
-      const newMessage: Message = {
-        id: Math.random().toString(36).substring(7),
-        text: `Server Response: ${data}`,
-        timestamp: new Date(),
-        type: "incoming",
-      };
-      setMessages((prev) => [...prev, newMessage]);
-    } catch (error) {
-      console.error("Error fetching from server:", error);
-    }
-  };
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -132,7 +76,8 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
   const elapsedTime = 0;
   // Helper function to get subtitle text based on agent status
   const getSubtitleText = () => {
-    switch (agentState.status) {
+    const { status } = agentState;
+    switch (status) {
       case "inactive":
         return "Please check your URL.";
       case "running":
@@ -140,7 +85,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
       case "complete":
         return "Here is what we know about your dev:";
       default:
-        agentState.status satisfies never;
+        status satisfies never;
     }
   };
 
@@ -179,7 +124,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
           </div>
 
           {/* Research Steps */}
-          {agentState.steps.length > 0 && (
+          {agentState.status !== "inactive" && agentState.steps.length > 0 && (
             <div className="mx-auto mb-8 max-w-3xl">
               <h3 className="mb-4 text-2xl font-semibold">Research Steps</h3>
               <Accordion type="single" collapsible className="w-full">
@@ -214,76 +159,6 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
               </Accordion>
             </div>
           )}
-
-          {/* Messages section */}
-          <div className="mx-auto mb-8 max-w-2xl">
-            <Card>
-              <CardHeader>
-                <CardTitle>Messages</CardTitle>
-                <CardDescription>
-                  Communication with the research agent
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="max-h-96 overflow-y-auto">
-                  <div className="space-y-3">
-                    {messages.length > 0 ? (
-                      messages.map((message) => (
-                        <div
-                          key={message.id}
-                          className={`max-w-[80%] rounded-lg p-3 ${
-                            message.type === "incoming"
-                              ? "bg-gray-200 text-gray-800"
-                              : "ml-auto bg-blue-500 text-white"
-                          }`}
-                        >
-                          <div className="break-words text-left">
-                            {message.text}
-                          </div>
-                          <div
-                            className={`mt-1 text-xs ${message.type === "incoming" ? "text-gray-500" : "text-blue-100"}`}
-                          >
-                            {formatTime(message.timestamp)}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-center text-gray-500">
-                        No messages yet
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Message form */}
-                <form className="mt-4 flex" onSubmit={handleSubmit}>
-                  <input
-                    type="text"
-                    ref={inputRef}
-                    className="flex-1 rounded-l-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Type your message..."
-                  />
-                  <button
-                    type="submit"
-                    className="rounded-r-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                  >
-                    Send
-                  </button>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* HTTP Request button */}
-          <div className="mx-auto max-w-md">
-            <button
-              type="button"
-              onClick={handleFetchRequest}
-              className="w-full rounded-md bg-gray-200 px-4 py-2 font-medium text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400/50"
-            >
-              Send HTTP Request
-            </button>
-          </div>
         </div>
       </div>
     ),

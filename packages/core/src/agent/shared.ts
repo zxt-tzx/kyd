@@ -1,28 +1,24 @@
-/**
- * Represents the state of an agent
- */
-export interface AgentState {
-  status: "inactive" | "running" | "complete";
-  initialPrompt: string;
-  steps: Array<{
-    title: string;
-    thoughts: string;
-    context: string;
-  }>;
-  title?: string;
-  thoughts?: string;
-  context?: string;
-}
+type AgentStatus = "inactive" | "running" | "complete";
 
-/**
- * Represents a message in the agent conversation
- */
-export interface Message {
-  id: string;
-  text: string;
-  timestamp: Date;
-  type: "incoming" | "outgoing";
+interface AgentInitInfo {
+  initiatedAt: Date;
+  title: string;
+  initialPrompt: string;
+  scratchpad: string;
 }
+export type AgentState =
+  | {
+      status: "inactive";
+    }
+  | {
+      status: Exclude<AgentStatus, "inactive">;
+      initInfo: AgentInitInfo;
+      steps: Array<{
+        title: string;
+        thoughts: string;
+        context: string;
+      }>;
+    };
 
 /**
  * Environment stage type
@@ -46,7 +42,6 @@ export function getAgentClientFetchOpts({
   const agent = "dev-research-agent";
 
   // Determine host based on stage
-  console.log({ stage });
   let host: string;
   switch (stage) {
     case "stg":
