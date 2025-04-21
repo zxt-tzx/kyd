@@ -11,12 +11,12 @@ export function Navbar() {
     </div>
   );
   const lightModeLogo = (
-    <h1 className="flex items-center font-mono text-2xl dark:hidden">
+    <h1 className="flex items-center text-2xl dark:hidden">
       {standardLogo}
     </h1>
   );
   const darkModeLogo = (
-    <h1 className="hidden items-center font-mono text-2xl dark:flex">
+    <h1 className="hidden items-center text-2xl dark:flex">
       {standardLogo}
     </h1>
   );

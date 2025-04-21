@@ -75,7 +75,7 @@ export function DevSearchInput() {
       >
         <Label
           htmlFor="dev-github-user-input"
-          className="block text-left font-mono text-lg"
+          className="block text-left text-lg"
         >
           Enter your dev&apos;s GitHub:
         </Label>
@@ -89,7 +89,7 @@ export function DevSearchInput() {
                   ref={inputRef}
                   id="dev-github-user-input"
                   type="text"
-                  className="h-12 border border-primary font-mono text-lg text-transparent caret-transparent"
+                  className="h-12 border border-primary text-lg text-transparent caret-transparent"
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onFocus={() => setIsFocused(true)}
@@ -107,7 +107,7 @@ export function DevSearchInput() {
                   // eslint-disable-next-line jsx-a11y/no-autofocus
                   autoFocus
                 />
-                <div className="pointer-events-none absolute inset-0 flex items-center px-3 font-mono text-lg">
+                <div className="pointer-events-none absolute inset-0 flex items-center px-3 text-lg">
                   <pre className="m-0 whitespace-pre p-0 text-[16px] text-foreground">
                     {form.state.values.input.slice(0, cursorPosition)}
                     {isFocused ? (

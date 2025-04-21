@@ -48,7 +48,7 @@ export function ResearchResultSkeleton({
   return (
     <div className="relative flex w-full justify-center pt-28">
       <div className="w-full max-w-screen-xl px-4 text-center">
-        <h1 className="mb-8 font-mono text-5xl tracking-tight">
+        <h1 className="mb-8 text-5xl tracking-tight">
           Loading Research
         </h1>
         <h2 className="mb-8 text-xl text-gray-600">
@@ -104,7 +104,7 @@ export function NotFoundView() {
   return (
     <div className="relative flex w-full justify-center pt-28">
       <div className="w-full max-w-screen-md px-4 text-center">
-        <h1 className="mb-8 font-mono text-5xl tracking-tight">
+        <h1 className="mb-8 text-5xl tracking-tight">
           Research Not Found
         </h1>
         <p className="mb-8 text-xl text-gray-600">
@@ -129,7 +129,7 @@ export function ErrorView({ error }: { error: unknown }) {
   return (
     <div className="relative flex w-full justify-center pt-28">
       <div className="w-full max-w-screen-md px-4 text-center">
-        <h1 className="mb-8 font-mono text-5xl tracking-tight">
+        <h1 className="mb-8 text-5xl tracking-tight">
           Something Went Wrong
         </h1>
         <div className="mx-auto mb-8 max-w-md">
@@ -137,7 +137,7 @@ export function ErrorView({ error }: { error: unknown }) {
             We encountered an error while processing your request.
           </p>
           <div className="mb-8 rounded-md bg-red-50 p-4 text-left">
-            <p className="font-mono text-red-700">{errorMessage}</p>
+            <p className="text-red-700">{errorMessage}</p>
           </div>
           <a
             href="/"
@@ -155,7 +155,7 @@ export function ErrorMessageView({ message }: { message: string | null }) {
   return (
     <div className="relative flex w-full justify-center pt-28">
       <div className="w-full max-w-screen-md px-4 text-center">
-        <h1 className="mb-8 font-mono text-5xl tracking-tight">
+        <h1 className="mb-8 text-5xl tracking-tight">
           Connection Error
         </h1>
         <div className="mx-auto mb-8 max-w-md">
@@ -163,7 +163,7 @@ export function ErrorMessageView({ message }: { message: string | null }) {
             We encountered an error connecting to the agent.
           </p>
           <div className="mb-8 rounded-md bg-red-50 p-4 text-left">
-            <p className="font-mono text-red-700">
+            <p className="text-red-700">
               {message ?? "Something went wrong"}
             </p>
           </div>

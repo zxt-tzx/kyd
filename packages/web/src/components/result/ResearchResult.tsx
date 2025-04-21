@@ -119,7 +119,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
 function InactiveAgentResult() {
   return (
     <>
-      <h1 className="mb-8 font-mono text-5xl tracking-tight">
+      <h1 className="mb-8 text-5xl tracking-tight">
         Inactive Research Agent
       </h1>
       <h2 className="mb-8 text-xl text-gray-600">Please check your URL</h2>
@@ -151,7 +151,7 @@ function RunningAgentResult({
 
   return (
     <>
-      <h1 className="mb-8 font-mono text-5xl tracking-tight">{title}</h1>
+      <h1 className="mb-8 text-5xl tracking-tight">{title}</h1>
       <h2 className="mb-8 text-xl text-gray-600">
         Time since research started: {elapsedTime} seconds.
       </h2>
@@ -169,7 +169,7 @@ function CompleteAgentResult({
 }) {
   return (
     <>
-      <h1 className="mb-8 font-mono text-5xl tracking-tight">{title}</h1>
+      <h1 className="mb-8 text-5xl tracking-tight">{title}</h1>
       <h2 className="mb-8 text-xl text-gray-600">
         Here is what we know about your dev
       </h2>
@@ -183,7 +183,7 @@ function AgentSteps({ steps }: { steps: AgentStep[] }) {
   return (
     <div className="mx-auto mb-8 max-w-3xl">
       <h3 className="mb-4 text-2xl font-semibold">Research Steps</h3>
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="single" collapsible className="w-full font-sans">
         {steps.map((step, index) => (
           <AccordionItem key={index} value={`step-${index}`}>
             <AccordionTrigger className="text-left font-medium">

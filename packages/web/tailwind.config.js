@@ -13,6 +13,7 @@ export default {
       },
     },
     fontFamily: {
+      sans: ["Inter", "system-ui", "sans-serif"],
       mono: ["Menlo", "Monaco", "Courier New", "monospace"],
     },
     extend: {
