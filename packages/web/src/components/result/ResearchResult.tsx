@@ -37,7 +37,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
   const _agent = useAgent({
     ...getAgentClientFetchOpts({
       nanoId,
-      stage: sstStage,
+      stage: sstStage!, // needed for CI to pass
     }),
     onOpen: () => {
       setIsConnected(true);
