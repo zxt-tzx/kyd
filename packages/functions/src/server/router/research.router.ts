@@ -54,7 +54,7 @@ export const researchRouter = new Hono<Context>()
           message: IS_USER_MESSAGE,
         });
       }
-      const prompt = "this is your initial prompt";
+      const prompt = "You are a sophisticated AI agent that is tasked to conduct research on developers. Please continue to iterate on your tools until you have compiled enough information to generate a well-informed writeup.";
       const { db } = getDeps();
       const cloudflareSecretKey = Resource.Keys.cloudflareSecretKey;
       const nanoId = await createNewResearch({
@@ -77,7 +77,7 @@ export const researchRouter = new Hono<Context>()
       // TODO: wrap this in db transaction?
       const response = await agentFetch(
         // Using shared configuration function
-        getAgentClientFetchOpts(nanoId),
+        getAgentClientFetchOpts({ nanoId, stage: Resource.App.stage }),
         {
           headers: {
             cloudflareSecretKey,

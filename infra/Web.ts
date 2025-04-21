@@ -11,6 +11,7 @@ const web = new sst.aws.StaticSite("Web", {
       }
       return url;
     }),
+    VITE_SST_STAGE: $app.stage,
   },
   build: {
     command: "vite build",

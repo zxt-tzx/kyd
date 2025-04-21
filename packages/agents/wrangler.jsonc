@@ -4,20 +4,68 @@
   "compatibility_date": "2025-03-14",
   "compatibility_flags": [
     "nodejs_compat",
-    "nodejs_compat_populate_process_env",
+    "nodejs_compat_populate_process_env"
   ],
   "durable_objects": {
     "bindings": [
       {
         "name": "DevResearchAgent",
-        "class_name": "DevResearchAgent",
-      },
-    ],
+        "class_name": "DevResearchAgent"
+      }
+    ]
   },
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["DevResearchAgent"],
-    },
+      "new_sqlite_classes": ["DevResearchAgent"]
+    }
   ],
+  "vars": {
+    "ENVIRONMENT": "development",
+    "DEBUG_MODE": "true"
+  },
+  "env": {
+    "stg": {
+      "name": "kyd-agent-stg",
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "DevResearchAgent",
+            "class_name": "DevResearchAgent"
+          }
+        ]
+      },
+      "vars": {
+        "ENVIRONMENT": "staging",
+        "DEBUG_MODE": "true"
+      },
+      "routes": [
+        {
+          "pattern": "kyd-agent-stg.theintel.io",
+          "custom_domain": true
+        }
+      ]
+    },
+    "prod": {
+      "name": "kyd-agent-prod",
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "DevResearchAgent",
+            "class_name": "DevResearchAgent"
+          }
+        ]
+      },
+      "vars": {
+        "ENVIRONMENT": "production",
+        "DEBUG_MODE": "false"
+      },
+      "routes": [
+        {
+          "pattern": "kyd-agent.theintel.io",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
 }
