@@ -1,6 +1,7 @@
 import { useAgent } from "agents/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import type { AgentStep } from "@/core/agent/shared";
 import {
   AgentStateSchema,
   getAgentClientFetchOpts,
@@ -133,7 +134,7 @@ function RunningAgentResult({
 }: {
   title: string;
   initiatedAt: string | number | Date;
-  steps: Array<{ title: string; thoughts: string; context: string }>;
+  steps: AgentStep[];
 }) {
   const [elapsedTime, setElapsedTime] = useState(() => {
     const start = new Date(initiatedAt).getTime();
@@ -164,7 +165,7 @@ function CompleteAgentResult({
   steps,
 }: {
   title: string;
-  steps: Array<{ title: string; thoughts: string; context: string }>;
+  steps: AgentStep[];
 }) {
   return (
     <>
@@ -177,11 +178,7 @@ function CompleteAgentResult({
   );
 }
 
-function AgentSteps({
-  steps,
-}: {
-  steps: Array<{ title: string; thoughts: string; context: string }>;
-}) {
+function AgentSteps({ steps }: { steps: AgentStep[] }) {
   if (!steps || steps.length === 0) return null;
   return (
     <div className="mx-auto mb-8 max-w-3xl">
@@ -190,27 +187,17 @@ function AgentSteps({
         {steps.map((step, index) => (
           <AccordionItem key={index} value={`step-${index}`}>
             <AccordionTrigger className="text-left font-medium">
-              Step {index + 1}: {step.title}
+              Step {index + 1}: {step.stepTitle}
             </AccordionTrigger>
             <AccordionContent>
               <Card>
                 <CardHeader>
-                  <CardTitle>Thoughts</CardTitle>
+                  <CardTitle>Details</CardTitle>
                 </CardHeader>
                 <CardContent className="whitespace-pre-wrap text-left">
-                  {step.thoughts}
+                  {step.details}
                 </CardContent>
               </Card>
-              {step.context && (
-                <Card className="mt-4">
-                  <CardHeader>
-                    <CardTitle>Context</CardTitle>
-                  </CardHeader>
-                  <CardContent className="whitespace-pre-wrap text-left">
-                    {step.context}
-                  </CardContent>
-                </Card>
-              )}
             </AccordionContent>
           </AccordionItem>
         ))}

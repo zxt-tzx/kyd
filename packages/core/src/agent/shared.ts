@@ -8,9 +8,8 @@ export const AgentInfo = z.object({
 });
 
 export const AgentStepSchema = z.object({
-  title: z.string(),
-  thoughts: z.string(),
-  context: z.string(),
+  stepTitle: z.string(),
+  details: z.string(),
 });
 
 export const AgentStateSchema = z.union([
