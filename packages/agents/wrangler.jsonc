@@ -1,6 +1,6 @@
 {
   "name": "kyd-agent",
-  "main": "src/server.ts",
+  "main": "src/agent.ts",
   "compatibility_date": "2025-03-14",
   "compatibility_flags": [
     "nodejs_compat",

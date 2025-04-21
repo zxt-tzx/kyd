@@ -1,16 +1,16 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { openai } from "@ai-sdk/openai";
-import { routeAgentRequest, type Connection, type Schedule } from "agents";
+import { getAgentByName, routeAgentRequest, type Connection } from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
 import { unstable_getSchedulePrompt } from "agents/schedule";
 import {
   createDataStreamResponse,
-  generateId,
+  generateText,
   streamText,
   type StreamTextOnFinishCallback,
 } from "ai";
 
-import { type AgentState } from "@/core/agent/shared";
+import { AgentMessageBodySchema, type AgentState } from "@/core/agent/shared";
 
 import { executions, tools } from "./tools";
 import { processToolCalls } from "./utils";
@@ -36,38 +36,6 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
   }
 
   async onRequest(request: Request) {
-    const action = request.headers.get("action");
-    const prompt = request.headers.get("prompt");
-    if (action === "initialize" && prompt) {
-      const name = this.name;
-      this.setState({
-        status: "running",
-        agentInfo: {
-          initialPrompt: prompt,
-          initiatedAt: new Date(),
-          scratchpad:
-            "Use this scratchpad to save information relating to the research. We will use all the information in this scratchpad to generate a writeup at the end.",
-          title: `Research Agent #${name}`,
-        },
-        steps: [],
-      });
-
-      // Schedule the startResearch task to begin in 100 milliseconds
-      await this.schedule(0.1, "startResearch", { prompt });
-      // Task scheduled, will execute soon
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: "Agent initialized successfully",
-        }),
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-    }
     const timestamp = new Date().toLocaleTimeString();
     return new Response(
       `Server time: ${timestamp} - We received your request!`,
@@ -77,6 +45,47 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
         },
       },
     );
+  }
+  async initialize(data: { prompt: string; htmlUrl: string }) {
+    // TODO: abstract and clean this up
+    let title;
+    try {
+      // Use generateText from the AI SDK (non-streaming approach)
+      const { text: titleText } = await generateText({
+        model,
+        system: "You are a helpful assistant that creates concise, descriptive titles.",
+        messages: [{
+          role: "user",
+          content: `Create a short, descriptive title (5-7 words max) for a research task with this prompt: "${data.prompt}"`
+        }],
+        temperature: 0.7,
+        maxTokens: 50
+      });
+
+      // Clean up the title
+      title = titleText.trim().replace(/^["']|["']$/g, '');
+      if (!title) {
+        title = `Research Agent #${this.name}`; // Fallback if empty
+      }
+    } catch (error) {
+      console.error("Error generating title:", error);
+      title = `Research Agent #${this.name}`; // Fallback on error
+    }
+
+    this.setState({
+      status: "running",
+      agentInfo: {
+        initialPrompt: data.prompt,
+        initiatedAt: new Date(),
+        scratchpad: "",
+        title,
+      },
+      steps: [],
+    });
+
+    await this.startResearch({ prompt: data.prompt, htmlUrl: data.htmlUrl });
+
+    return { success: true, message: "Agent initialized successfully" };
   }
   /**
    * Handles incoming chat messages and manages the response stream
@@ -123,33 +132,11 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
       return dataStreamResponse;
     });
   }
-  async executeTask(description: string, task: Schedule<string>) {
-    await this.saveMessages([
-      ...this.messages,
-      {
-        id: generateId(),
-        role: "user",
-        content: `Running scheduled task: ${description}`,
-        createdAt: new Date(),
-      },
-    ]);
-
-    // Handle different scheduled tasks based on their description
-    if (description === "startResearch") {
-      // Parse the payload from the task
-      const payload =
-        typeof task.payload === "string"
-          ? JSON.parse(task.payload)
-          : task.payload;
-      await this.startResearch(payload);
-    }
-  }
-
   /**
    * Starts the research process and generates steps
-   * @param data - Data passed to the task, including the initial prompt
+   * @param data - Data passed to the task, including the initial prompt and GitHub URL
    */
-  async startResearch(data: { prompt: string }) {
+  async startResearch(data: { prompt: string; htmlUrl: string }) {
     // Starting research process with the provided prompt
     const currentState = this.state;
     if (currentState.status !== "running") return;
@@ -164,8 +151,7 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
       },
       {
         stepTitle: "Gathering Initial Information",
-        details:
-          "Collecting relevant information and resources to address the research topic.",
+        details: `Collecting relevant information from GitHub profile: ${data.htmlUrl}`,
       },
     ];
 
@@ -174,21 +160,6 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
       ...currentState,
       steps: initialSteps,
     });
-
-    // Example of updating scratchpad with interesting information
-    // Simulate a delayed update (in a real implementation, this would be based on actual research)
-    setTimeout(() => {
-      this.updateScratchpad(
-        "Initial research shows several promising avenues to explore...",
-      );
-
-      // Add a new step to demonstrate progress
-      this.addResearchStep({
-        stepTitle: "Analyzing Key Concepts",
-        details:
-          "Breaking down the main concepts in the research topic and identifying connections between them.",
-      });
-    }, 3000);
   }
 
   /**
@@ -231,29 +202,69 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
  */
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
+    // from backend, check API key
+    // TODO: from frontend, check auth cookie
+    // Check if cloudflareSecretKey in headers matches process.env.CLOUDFLARE_SECRET_KEY
+    // Handle POST requests with JSON body for initialization
+    if (
+      request.method === "POST" &&
+      request.headers.get("content-type")?.includes("application/json")
+    ) {
+      try {
+        const cloudflareSecretKey = request.headers.get("cloudflareSecretKey");
+        if (
+          !cloudflareSecretKey ||
+          cloudflareSecretKey !== env.CLOUDFLARE_SECRET_KEY
+        ) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+
+        const body = await request.json();
+        const messageBody = AgentMessageBodySchema.parse(body);
+
+        if (messageBody.action === "initialize") {
+          // Get the agent ID from the URL
+          const url = new URL(request.url);
+          const pathParts = url.pathname.split("/");
+          const agentName = pathParts[pathParts.length - 1];
+          if (!agentName) {
+            throw new Response("Missing agent name", { status: 400 });
+          }
+          const { htmlUrl, prompt } = messageBody;
+
+          // Create a stub of the agent to interact with the Durable Object
+          const agent = await getAgentByName(env.DevResearchAgent, agentName);
+          await agent.initialize({ htmlUrl, prompt });
+
+          return new Response("Agent initialized successfully", {
+            headers: { "Content-Type": "text/plain" },
+            status: 200,
+          });
+        }
+      } catch (error) {
+        console.error("Error processing request:", error);
+        return new Response(
+          JSON.stringify({
+            success: false,
+            message: error instanceof Error ? error.message : "Unknown error",
+          }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+    }
+
     return (
-      // Route the request to our agent or return 404 if not found
+      // Route other requests to our agent or return 404 if not found
       (await routeAgentRequest(request, env, {
-        // prefix: "dev-research-agent",
         cors: true,
         onBeforeConnect: (connection) => {
           // for websocket connection, future TODO: cookie auth?
-          // console.log("connection no auth required for now!!");
           return connection;
         },
         onBeforeRequest: (request) => {
-          // Check if cloudflareSecretKey in headers matches process.env.CLOUDFLARE_SECRET_KEY
-          const cloudflareSecretKey = request.headers.get(
-            "cloudflareSecretKey",
-          );
-          if (
-            !cloudflareSecretKey ||
-            cloudflareSecretKey !== env.CLOUDFLARE_SECRET_KEY
-          ) {
-            return new Response("Unauthorized", {
-              status: 401,
-            });
-          }
           return request;
         },
       })) || new Response("Not found", { status: 404 })

@@ -1,12 +1,17 @@
 import { zValidator } from "@hono/zod-validator";
 import { agentFetch } from "agents/client";
+import dedent from "dedent";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { Resource } from "sst";
 import { z } from "zod";
 
-import { getAgentClientFetchOpts } from "@/core/agent/shared";
+import type { AgentMessageBody } from "@/core/agent/shared";
+import {
+  AgentMessageBodySchema,
+  getAgentClientFetchOpts,
+} from "@/core/agent/shared";
 import { eq } from "@/core/db";
 import { researches } from "@/core/db/schema/entities/research.sql";
 import { githubUsernameSchema } from "@/core/github/schema.validation";
@@ -54,7 +59,12 @@ export const researchRouter = new Hono<Context>()
           message: IS_USER_MESSAGE,
         });
       }
-      const prompt = "You are a sophisticated AI agent that is tasked to conduct research on developers. Please continue to iterate on your tools until you have compiled enough information to generate a well-informed writeup.";
+      const htmlUrl = user.html_url;
+      const prompt = dedent`
+        You are a sophisticated AI agent that is tasked to conduct research on this developer. Please continue to iterate on your tools until you have compiled enough information to generate a well-informed writeup.
+
+        GitHub URL: ${htmlUrl}
+      `;
       const { db } = getDeps();
       const cloudflareSecretKey = Resource.Keys.cloudflareSecretKey;
       const nanoId = await createNewResearch({
@@ -67,23 +77,32 @@ export const researchRouter = new Hono<Context>()
           name: user.name,
           email: user.email,
           avatarUrl: user.avatar_url,
-          htmlUrl: user.html_url,
+          htmlUrl,
           company: user.company,
           location: user.location,
           bio: user.bio,
         },
         db,
       });
+
+      // Create and validate the request body
+      const messageBody: AgentMessageBody = {
+        action: "initialize",
+        prompt,
+        htmlUrl,
+      };
+
       // TODO: wrap this in db transaction?
       const response = await agentFetch(
         // Using shared configuration function
         getAgentClientFetchOpts({ nanoId, stage: Resource.App.stage }),
         {
+          method: "POST",
           headers: {
             cloudflareSecretKey,
-            action: "initialize",
-            prompt,
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify(AgentMessageBodySchema.parse(messageBody)),
         },
       );
       if (!response.ok) {

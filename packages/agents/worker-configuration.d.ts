@@ -6,7 +6,7 @@ declare namespace Cloudflare {
 		DEBUG_MODE: "true" | "false";
 		OPENAI_API_KEY: string;
 		CLOUDFLARE_SECRET_KEY: string;
-		DevResearchAgent: DurableObjectNamespace<import("./src/server").DevResearchAgent>;
+		DevResearchAgent: DurableObjectNamespace<import("./src/agent").DevResearchAgent>;
 	}
 }
 interface Env extends Cloudflare.Env {}
