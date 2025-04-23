@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@know-your-dev/core": "workspace:*",
+    "exa-js": "^1.6.13",
     "zod": "*"
   },
   "devDependencies": {

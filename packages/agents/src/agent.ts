@@ -2,12 +2,15 @@ import { getAgentByName, routeAgentRequest, type Connection } from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
 import { generateText, streamText } from "ai";
 import dedent from "dedent";
+import { Exa } from "exa-js";
 
 import { AgentMessageBodySchema, type AgentState } from "@/core/agent/shared";
+import { fetchPinnedRepos } from "@/core/github/pinned";
 import { fetchUser } from "@/core/github/user";
 import { createContext } from "@/core/util/context";
 
-import { smallQuickModel } from "./models";
+import { smallQuickModel, workhorseModel } from "./models";
+import { extractInfoFromWebsite } from "./research";
 
 export const agentContext = createContext<DevResearchAgent>();
 /**
@@ -60,7 +63,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
       initiatedAt: new Date(),
       prompt: data.prompt,
       findings: `# Key Findings re: ${githubUsername}`,
-      log: "Initializing research...",
+      log: `Initializing research of ${githubUsername}...`,
       report: null,
     });
 
@@ -76,8 +79,9 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     // get basic user info from API
     this.appendLog("Fetching basic user info...");
     const user = await fetchUser(this.state.githubUsername);
+    this.appendLog(`Successfully fetched user info`);
     const basicUserInfo = dedent`
-    # Basic user info
+    ## Basic user info
     - Login: ${user.login}
     ${user.name ? `- Name: ${user.name}` : ""}
     - Joined on ${user.created_at}
@@ -94,6 +98,43 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
       newInfo: basicUserInfo,
       message: "Adding basic user info to findings...",
     });
+
+    this.appendLog("Getting user's pinned repos...");
+    const pinnedRepos = await fetchPinnedRepos(this.state.githubUsername);
+    if (pinnedRepos.length > 0) {
+      const exa = new Exa(this.env.EXA_API_KEY);
+      this.appendFindings({
+        newInfo: "## Pinned Repos",
+        message: "Successfully fetched pinned repos",
+      });
+      for (const repo of pinnedRepos) {
+        this.appendLog(`Getting info of ${repo.author}/${repo.name}`);
+        const keyRepoInfo = await extractInfoFromWebsite({
+          url: repo.url,
+          exa,
+          model: workhorseModel,
+          instructions: {
+            whatThisIs: "The text of a pinned repo",
+            whatToExtract:
+              "Please extract is a nice markdown format key information about the repo, like the README and description (what the repo does), whether it's active, number of contributors and so on.",
+          },
+        });
+        console.log({ keyRepoInfo });
+        const pinnedRepoInfo = dedent`
+        ### Pinned repo: ${repo.name}
+        - Description: ${repo.description}
+        - Author: ${repo.author}
+        - Language: ${repo.language}
+        ${repo.stars ? `- Stars: ${repo.stars}` : ""}
+        ${repo.forks ? `- Forks: ${repo.forks}` : ""}
+        - Other repo info: ${keyRepoInfo}
+        `;
+        this.appendFindings({
+          newInfo: pinnedRepoInfo,
+          message: "Adding pinned repo info to findings...",
+        });
+      }
+    }
   }
 
   /**
