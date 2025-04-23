@@ -1,18 +1,11 @@
 import { useAgent } from "agents/react";
 import { createContext, useContext, useEffect, useState } from "react";
 
-import type { AgentStep } from "@/core/agent/shared";
 import {
   AgentStateSchema,
   getAgentClientFetchOpts,
   type AgentState,
 } from "@/core/agent/shared";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface ResearchResultProps {
@@ -79,15 +72,15 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
             {agentState.status === "inactive" && <InactiveAgentResult />}
             {agentState.status === "running" && (
               <RunningAgentResult
-                title={agentState.agentInfo.title}
-                initiatedAt={agentState.agentInfo.initiatedAt}
-                steps={agentState.steps}
+                title={agentState.title}
+                initiatedAt={agentState.initiatedAt}
+                log={agentState.log}
               />
             )}
             {agentState.status === "complete" && (
               <CompleteAgentResult
-                title={agentState.agentInfo.title}
-                steps={agentState.steps}
+                title={agentState.title}
+                log={agentState.log}
               />
             )}
           </div>
@@ -109,11 +102,11 @@ function InactiveAgentResult() {
 function RunningAgentResult({
   title,
   initiatedAt,
-  steps,
+  log,
 }: {
   title: string;
   initiatedAt: string | number | Date;
-  steps: AgentStep[];
+  log: string;
 }) {
   const [elapsedTime, setElapsedTime] = useState(() => {
     const start = new Date(initiatedAt).getTime();
@@ -144,50 +137,33 @@ function RunningAgentResult({
         </span>
         <span>{elapsedTime}s</span>
       </h2>
-      <AgentSteps title={title} steps={steps} />
+      <div className="mx-auto mb-8 max-w-3xl">
+        <h3 className="mb-4 text-2xl font-semibold">{title}</h3>
+        <Card className="font-sans">
+          <CardContent className="whitespace-pre-wrap py-4 text-left">
+            {log}
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 }
 
-function CompleteAgentResult({
-  title,
-  steps,
-}: {
-  title: string;
-  steps: AgentStep[];
-}) {
+function CompleteAgentResult({ title, log }: { title: string; log: string }) {
   return (
     <>
       <h1 className="mb-8 text-5xl tracking-tight">Research Complete</h1>
       <h2 className="mb-8 text-xl text-gray-600">
         Here is what we know about your dev
       </h2>
-      <AgentSteps title={title} steps={steps} />
+      <div className="mx-auto mb-8 max-w-3xl">
+        <h3 className="mb-4 text-2xl font-semibold">{title}</h3>
+        <Card className="font-sans">
+          <CardContent className="whitespace-pre-wrap py-4 text-left">
+            {log}
+          </CardContent>
+        </Card>
+      </div>
     </>
-  );
-}
-
-function AgentSteps({ title, steps }: { title: string; steps: AgentStep[] }) {
-  if (!steps || steps.length === 0) return null;
-  return (
-    <div className="mx-auto mb-8 max-w-3xl">
-      <h3 className="mb-4 text-2xl font-semibold">{title}</h3>
-      <Accordion type="single" collapsible className="w-full font-sans">
-        {steps.map((step, index) => (
-          <AccordionItem key={index} value={`step-${index}`}>
-            <AccordionTrigger className="text-left font-medium">
-              Step {index + 1}: {step.stepTitle}
-            </AccordionTrigger>
-            <AccordionContent>
-              <Card>
-                <CardContent className="whitespace-pre-wrap py-4 text-left">
-                  {step.details}
-                </CardContent>
-              </Card>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </div>
   );
 }
