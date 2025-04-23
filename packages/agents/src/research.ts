@@ -19,7 +19,7 @@ export async function extractInfoFromWebsite({
   const urlText = (await exa.getContents(url)).results
     .map((r) => r.text)
     .join("\n\n");
-  await generateText({
+  const { text } = await generateText({
     model,
     system: `You are a helpful assistant that is an expert at processing large amounts of textual information. You are given ${instructions.whatThisIs} and your job is to extract ${instructions.whatToExtract}`,
     messages: [
@@ -30,4 +30,5 @@ export async function extractInfoFromWebsite({
     ],
     temperature: 0.3,
   });
+  return text;
 }

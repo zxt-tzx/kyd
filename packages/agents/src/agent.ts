@@ -1,12 +1,12 @@
 import { getAgentByName, routeAgentRequest, type Connection } from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
-import { generateText, streamText } from "ai";
+import { generateText } from "ai";
 import dedent from "dedent";
 import { Exa } from "exa-js";
 
 import { AgentMessageBodySchema, type AgentState } from "@/core/agent/shared";
 import { fetchPinnedRepos } from "@/core/github/pinned";
-import { fetchUser } from "@/core/github/user";
+import { getRestOctokit } from "@/core/github/shared";
 import { createContext } from "@/core/util/context";
 
 import { smallQuickModel, workhorseModel } from "./models";
@@ -21,7 +21,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     status: "inactive",
   };
   onStateUpdate(state: AgentState, source: Connection | "server") {
-    console.log("State updated:", state);
+    // console.log("State updated:", state);
   }
   onConnect(connection: Connection) {
     console.log("Client connected:", this.name);
@@ -72,15 +72,23 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     return { success: true, message: "Agent initialized successfully" };
   }
   async research() {
-    if (this.state.status !== "running") {
-      this.appendLog("Agent is not running, terminating startResearch");
-      return;
-    }
-    // get basic user info from API
-    this.appendLog("Fetching basic user info...");
-    const user = await fetchUser(this.state.githubUsername);
-    this.appendLog(`Successfully fetched user info`);
-    const basicUserInfo = dedent`
+    try {
+      if (this.state.status !== "running") {
+        this.appendLog("Agent is not running, terminating startResearch");
+        return;
+      }
+      // get basic user info from API
+      this.appendLog("Fetching basic user info...");
+      const restOctokit = getRestOctokit({
+        type: "token",
+        token: this.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+      });
+      const { data: user } = await restOctokit.rest.users.getByUsername({
+        username: this.state.githubUsername,
+      });
+
+      this.appendLog(`Successfully fetched user info`);
+      const basicUserInfo = dedent`
     ## Basic user info
     - Login: ${user.login}
     ${user.name ? `- Name: ${user.name}` : ""}
@@ -94,33 +102,32 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     Number of followers: ${user.followers}
     Number of following: ${user.following}
     `;
-    this.appendFindings({
-      newInfo: basicUserInfo,
-      message: "Adding basic user info to findings...",
-    });
-
-    this.appendLog("Getting user's pinned repos...");
-    const pinnedRepos = await fetchPinnedRepos(this.state.githubUsername);
-    if (pinnedRepos.length > 0) {
-      const exa = new Exa(this.env.EXA_API_KEY);
       this.appendFindings({
-        newInfo: "## Pinned Repos",
-        message: "Successfully fetched pinned repos",
+        newInfo: basicUserInfo,
+        message: "Adding basic user info to findings...",
       });
-      for (const repo of pinnedRepos) {
-        this.appendLog(`Getting info of ${repo.author}/${repo.name}`);
-        const keyRepoInfo = await extractInfoFromWebsite({
-          url: repo.url,
-          exa,
-          model: workhorseModel,
-          instructions: {
-            whatThisIs: "The text of a pinned repo",
-            whatToExtract:
-              "Please extract is a nice markdown format key information about the repo, like the README and description (what the repo does), whether it's active, number of contributors and so on.",
-          },
+
+      this.appendLog("Getting user's pinned repos...");
+      const pinnedRepos = await fetchPinnedRepos(this.state.githubUsername);
+      if (pinnedRepos.length > 0) {
+        const exa = new Exa(this.env.EXA_API_KEY);
+        this.appendFindings({
+          newInfo: "## Pinned Repos",
+          message: "Successfully fetched pinned repos",
         });
-        console.log({ keyRepoInfo });
-        const pinnedRepoInfo = dedent`
+        for (const repo of pinnedRepos) {
+          this.appendLog(`Getting info of ${repo.author}/${repo.name}`);
+          const keyRepoInfo = await extractInfoFromWebsite({
+            url: repo.url,
+            exa,
+            model: workhorseModel,
+            instructions: {
+              whatThisIs: `This is a repo pinned by ${this.state.githubUsername} and the purpose of this analysis is summarized in this prompt: ${this.state.prompt}`,
+              whatToExtract:
+                "Key information about the repo, like the README and description (what the repo does). Maximum of 3 short paragraphs, include the most critical information only.",
+            },
+          });
+          const pinnedRepoInfo = dedent`
         ### Pinned repo: ${repo.name}
         - Description: ${repo.description}
         - Author: ${repo.author}
@@ -129,11 +136,27 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
         ${repo.forks ? `- Forks: ${repo.forks}` : ""}
         - Other repo info: ${keyRepoInfo}
         `;
-        this.appendFindings({
-          newInfo: pinnedRepoInfo,
-          message: "Adding pinned repo info to findings...",
-        });
+          this.appendFindings({
+            newInfo: pinnedRepoInfo,
+            message: "Adding pinned repo info to findings...",
+          });
+        }
       }
+      const starredRepos =
+        await restOctokit.rest.activity.listReposStarredByUser({
+          username: this.state.githubUsername,
+        });
+      const watchedRepos =
+        await restOctokit.rest.activity.listReposWatchedByUser({
+          username: this.state.githubUsername,
+        });
+
+      const publicGists = await restOctokit.rest.gists.listForUser({
+        username: this.state.githubUsername,
+      });
+    } catch (error) {
+      console.error("Error: ", error);
+      this.appendLog(`Error fetching user info: ${error}`);
     }
   }
 
@@ -145,6 +168,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
   appendLog(newInfo: string) {
     if (this.state.status !== "running") return;
     const updatedLog = this.state.log + "\n\n" + newInfo;
+    console.log("Log updated:", newInfo, "\n\n");
     this.setState({
       ...this.state,
       log: updatedLog,
@@ -159,6 +183,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     message: string;
   }) {
     if (this.state.status !== "running") return;
+    console.log("Findings updated:", newInfo, "\n\n");
     const updatedFindings = this.state.findings + "\n\n" + newInfo;
     this.appendLog(logMessage);
     this.setState({

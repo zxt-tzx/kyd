@@ -139,7 +139,7 @@ function RunningAgentResult({
       </h2>
       <div className="mx-auto mb-8 max-w-3xl">
         <h3 className="mb-4 text-2xl font-semibold">{title}</h3>
-        <Card className="font-sans">
+        <Card>
           <CardContent className="whitespace-pre-wrap py-4 text-left">
             {log}
           </CardContent>
