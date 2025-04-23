@@ -89,7 +89,7 @@ export const researchRouter = new Hono<Context>()
       const messageBody: AgentMessageBody = {
         action: "initialize",
         prompt,
-        htmlUrl,
+        githubUsername: username,
       };
 
       // TODO: wrap this in db transaction?

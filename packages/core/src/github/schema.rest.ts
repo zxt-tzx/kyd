@@ -49,7 +49,7 @@ export const githubUserSchema = z
     html_url: z.string().url(),
     // followers_url: z.string().url(),
     // following_url: z.string().url(),
-    gists_url: z.string().url(),
+    gists_url: z.string().url(), // useful
     starred_url: z.string().url(), // if you omit {/owner}{/repo} then this gives ALL starred repos of that user
     subscriptions_url: z.string().url(), // all PUBLIC repos that the user is watching
     organizations_url: z.string().url(), // all PUBLIC orgs that the user is a member of
