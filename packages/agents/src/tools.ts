@@ -2,11 +2,9 @@
  * Tool definitions for the AI chat agent
  * Tools can either require human confirmation or execute automatically
  */
-import { unstable_scheduleSchema } from "agents/schedule";
 import { tool } from "ai";
 import { z } from "zod";
 
-import { agentContext } from "./server";
 
 /**
  * Weather information tool that requires human confirmation
@@ -33,87 +31,88 @@ const getLocalTime = tool({
   },
 });
 
-const scheduleTask = tool({
-  description: "A tool to schedule a task to be executed at a later time",
-  parameters: unstable_scheduleSchema,
-  execute: async ({ when, description }) => {
-    // we can now read the agent context from the ALS store
-    const agent = agentContext.getStore();
-    if (!agent) {
-      throw new Error("No agent found");
-    }
-    function throwError(msg: string): string {
-      throw new Error(msg);
-    }
-    if (when.type === "no-schedule") {
-      return "Not a valid schedule input";
-    }
-    const input =
-      when.type === "scheduled"
-        ? when.date // scheduled
-        : when.type === "delayed"
-          ? when.delayInSeconds // delayed
-          : when.type === "cron"
-            ? when.cron // cron
-            : throwError("not a valid schedule input");
-    try {
-      agent.schedule(input!, "executeTask", description);
-    } catch (error) {
-      console.error("error scheduling task", error);
-      return `Error scheduling task: ${error}`;
-    }
-    return `Task scheduled for type "${when.type}" : ${input}`;
-  },
-});
+// const scheduleTask = tool({
+//   description: "A tool to schedule a task to be executed at a later time",
+//   parameters: unstable_scheduleSchema,
+//   execute: async ({ when, description }) => {
+//     const agent = agentContext.use();
+
+//     function throwError(msg: string): string {
+//       throw new Error(msg);
+//     }
+
+//     if (when.type === "no-schedule") {
+//       return "Not a valid schedule input";
+//     }
+
+//     const input =
+//       when.type === "scheduled"
+//         ? when.date // scheduled
+//         : when.type === "delayed"
+//           ? when.delayInSeconds // delayed
+//           : when.type === "cron"
+//             ? when.cron // cron
+//             : throwError("not a valid schedule input");
+
+//     try {
+//       agent.schedule(input!, "executeTask", description);
+//       return `Task scheduled for type "${when.type}" : ${input}`;
+//     } catch (error) {
+//       console.error("Error scheduling task", error);
+//       return `Error scheduling task: ${error}`;
+//     }
+//   },
+// });
 
 /**
  * Tool to list all scheduled tasks
  * This executes automatically without requiring human confirmation
  */
-const getScheduledTasks = tool({
-  description: "List all tasks that have been scheduled",
-  parameters: z.object({}),
-  execute: async () => {
-    const agent = agentContext.getStore();
-    if (!agent) {
-      throw new Error("No agent found");
-    }
-    try {
-      const tasks = agent.getSchedules();
-      if (!tasks || tasks.length === 0) {
-        return "No scheduled tasks found.";
-      }
-      return tasks;
-    } catch (error) {
-      console.error("Error listing scheduled tasks", error);
-      return `Error listing scheduled tasks: ${error}`;
-    }
-  },
-});
+// const getScheduledTasks = tool({
+//   description: "List all tasks that have been scheduled",
+//   parameters: z.object({}),
+//   execute: async () => {
+//     try {
+//       // Use the context helper instead of direct access
+//       const agent = agentContext.use();
+
+//       try {
+//         const tasks = agent.getSchedules();
+//         if (!tasks || tasks.length === 0) {
+//           return "No scheduled tasks found.";
+//         }
+//         return tasks;
+//       } catch (error) {
+//         console.error("Error listing scheduled tasks", error);
+//         return `Error listing scheduled tasks: ${error}`;
+//       }
+//     } catch (error) {
+//       console.error("Error accessing agent context", error);
+//       return "Error: Agent context not available";
+//     }
+//   },
+// });
 
 /**
  * Tool to cancel a scheduled task by its ID
  * This executes automatically without requiring human confirmation
  */
-const cancelScheduledTask = tool({
-  description: "Cancel a scheduled task using its ID",
-  parameters: z.object({
-    taskId: z.string().describe("The ID of the task to cancel"),
-  }),
-  execute: async ({ taskId }) => {
-    const agent = agentContext.getStore();
-    if (!agent) {
-      throw new Error("No agent found");
-    }
-    try {
-      await agent.cancelSchedule(taskId);
-      return `Task ${taskId} has been successfully canceled.`;
-    } catch (error) {
-      console.error("Error canceling scheduled task", error);
-      return `Error canceling task ${taskId}: ${error}`;
-    }
-  },
-});
+// const cancelScheduledTask = tool({
+//   description: "Cancel a scheduled task using its ID",
+//   parameters: z.object({
+//     taskId: z.string().describe("The ID of the task to cancel"),
+//   }),
+//   execute: async ({ taskId }) => {
+//     const agent = agentContext.use();
+//     try {
+//       await agent.cancelSchedule(taskId);
+//       return `Task ${taskId} has been successfully canceled.`;
+//     } catch (error) {
+//       console.error("Error canceling scheduled task", error);
+//       return `Error canceling task ${taskId}: ${error}`;
+//     }
+//   },
+// });
 
 /**
  * Export all available tools
@@ -122,9 +121,9 @@ const cancelScheduledTask = tool({
 export const tools = {
   getWeatherInformation,
   getLocalTime,
-  scheduleTask,
-  getScheduledTasks,
-  cancelScheduledTask,
+  //   scheduleTask,
+  //   getScheduledTasks,
+  //   cancelScheduledTask,
 };
 
 /**

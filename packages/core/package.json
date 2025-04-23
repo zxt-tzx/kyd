@@ -20,9 +20,9 @@
     ]
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.3.12",
+    "@ai-sdk/openai": "^1.3.16",
     "@openauthjs/openauth": "^0.3.6",
-    "agents": "^0.0.59",
+    "agents": "^0.0.60",
     "ai": "^4.3.5",
     "dedent": "^1.5.3",
     "drizzle-orm": "^0.40.0",

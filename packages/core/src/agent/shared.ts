@@ -21,9 +21,20 @@ export const AgentStateSchema = z.union([
   }),
 ]);
 
+/**
+ * Schema for the agent message body fields
+ * Used to validate the POST request body in the research router
+ */
+export const AgentMessageBodySchema = z.object({
+  action: z.enum(["initialize"]),
+  prompt: z.string(),
+  htmlUrl: z.string().url(),
+});
+
 export type AgentInfo = z.infer<typeof AgentInfo>;
 export type AgentStep = z.infer<typeof AgentStepSchema>;
 export type AgentState = z.infer<typeof AgentStateSchema>;
+export type AgentMessageBody = z.infer<typeof AgentMessageBodySchema>;
 
 /**
  * Environment stage type

@@ -1,5 +1,5 @@
 import { useAgent } from "agents/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 import type { AgentStep } from "@/core/agent/shared";
 import {
@@ -13,19 +13,18 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ResearchResultProps {
   nanoId: string;
 }
 
 const sstStage = import.meta.env.VITE_SST_STAGE;
+
+const ConnectionContext = createContext<{
+  isConnected: boolean;
+  isLoading: boolean;
+} | null>(null);
 
 export function ResearchResult({ nanoId }: ResearchResultProps) {
   const [isConnected, setIsConnected] = useState(false);
@@ -52,7 +51,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
       setIsLoading(false);
     },
     onStateUpdate: (newState: unknown) => {
-      console.log({ newState });
+      // State update received
       const result = AgentStateSchema.safeParse(newState);
       if (result.success) {
         setAgentState(result.data);
@@ -73,45 +72,27 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
     isConnected,
     agentStatus: agentState.status,
     component: (
-      <div className="relative flex w-full justify-center pt-28">
-        <div className="w-full max-w-screen-xl px-4 text-center">
-          {/* Render based on agentState.status */}
-          {agentState.status === "inactive" && <InactiveAgentResult />}
-          {agentState.status === "running" && (
-            <RunningAgentResult
-              title={agentState.agentInfo.title}
-              initiatedAt={agentState.agentInfo.initiatedAt}
-              steps={agentState.steps}
-            />
-          )}
-          {agentState.status === "complete" && (
-            <CompleteAgentResult
-              title={agentState.agentInfo.title}
-              steps={agentState.steps}
-            />
-          )}
-
-          {/* Connection status indicator */}
-          <div className="mb-8 flex items-center justify-center">
-            <div
-              className={`mr-2 size-3 rounded-full ${
-                isLoading
-                  ? "bg-amber-500"
-                  : isConnected
-                    ? "bg-green-500"
-                    : "bg-red-500"
-              }`}
-            />
-            <span className="text-sm text-gray-600">
-              {isLoading
-                ? "Connecting..."
-                : isConnected
-                  ? "Connected to server"
-                  : "Disconnected"}
-            </span>
+      <ConnectionContext.Provider value={{ isConnected, isLoading }}>
+        <div className="relative flex w-full justify-center pt-28">
+          <div className="w-full max-w-screen-xl px-4 text-center">
+            {/* Render based on agentState.status */}
+            {agentState.status === "inactive" && <InactiveAgentResult />}
+            {agentState.status === "running" && (
+              <RunningAgentResult
+                title={agentState.agentInfo.title}
+                initiatedAt={agentState.agentInfo.initiatedAt}
+                steps={agentState.steps}
+              />
+            )}
+            {agentState.status === "complete" && (
+              <CompleteAgentResult
+                title={agentState.agentInfo.title}
+                steps={agentState.steps}
+              />
+            )}
           </div>
         </div>
-      </div>
+      </ConnectionContext.Provider>
     ),
   };
 }
@@ -119,9 +100,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
 function InactiveAgentResult() {
   return (
     <>
-      <h1 className="mb-8 text-5xl tracking-tight">
-        Inactive Research Agent
-      </h1>
+      <h1 className="mb-8 text-5xl tracking-tight">Inactive Research Agent</h1>
       <h2 className="mb-8 text-xl text-gray-600">Please check your URL</h2>
     </>
   );
@@ -140,6 +119,10 @@ function RunningAgentResult({
     const start = new Date(initiatedAt).getTime();
     return Math.floor((Date.now() - start) / 1000);
   });
+  const { isConnected, isLoading } = useContext(ConnectionContext) || {
+    isConnected: false,
+    isLoading: false,
+  };
 
   useEffect(() => {
     const start = new Date(initiatedAt).getTime();
@@ -151,11 +134,17 @@ function RunningAgentResult({
 
   return (
     <>
-      <h1 className="mb-8 text-5xl tracking-tight">{title}</h1>
+      <h1 className="mb-8 text-5xl tracking-tight">Researching Dev...</h1>
       <h2 className="mb-8 text-xl text-gray-600">
-        Time since research started: {elapsedTime} seconds.
+        <span className="mx-2 inline-flex items-center">
+          <span className="text-gray-600">Connection: </span>
+          <div
+            className={`mx-2 size-3 rounded-full ${isLoading ? "bg-amber-500" : isConnected ? "bg-green-500" : "bg-red-500"}`}
+          />
+        </span>
+        <span>{elapsedTime}s</span>
       </h2>
-      <AgentSteps steps={steps} />
+      <AgentSteps title={title} steps={steps} />
     </>
   );
 }
@@ -169,20 +158,20 @@ function CompleteAgentResult({
 }) {
   return (
     <>
-      <h1 className="mb-8 text-5xl tracking-tight">{title}</h1>
+      <h1 className="mb-8 text-5xl tracking-tight">Research Complete</h1>
       <h2 className="mb-8 text-xl text-gray-600">
         Here is what we know about your dev
       </h2>
-      <AgentSteps steps={steps} />
+      <AgentSteps title={title} steps={steps} />
     </>
   );
 }
 
-function AgentSteps({ steps }: { steps: AgentStep[] }) {
+function AgentSteps({ title, steps }: { title: string; steps: AgentStep[] }) {
   if (!steps || steps.length === 0) return null;
   return (
     <div className="mx-auto mb-8 max-w-3xl">
-      <h3 className="mb-4 text-2xl font-semibold">Research Steps</h3>
+      <h3 className="mb-4 text-2xl font-semibold">{title}</h3>
       <Accordion type="single" collapsible className="w-full font-sans">
         {steps.map((step, index) => (
           <AccordionItem key={index} value={`step-${index}`}>
@@ -191,10 +180,7 @@ function AgentSteps({ steps }: { steps: AgentStep[] }) {
             </AccordionTrigger>
             <AccordionContent>
               <Card>
-                <CardHeader>
-                  <CardTitle>Details</CardTitle>
-                </CardHeader>
-                <CardContent className="whitespace-pre-wrap text-left">
+                <CardContent className="whitespace-pre-wrap py-4 text-left">
                   {step.details}
                 </CardContent>
               </Card>
