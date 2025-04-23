@@ -1,20 +1,11 @@
-import { AsyncLocalStorage } from "node:async_hooks";
 import { openai } from "@ai-sdk/openai";
 import { getAgentByName, routeAgentRequest, type Connection } from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
-import { unstable_getSchedulePrompt } from "agents/schedule";
-import {
-  createDataStreamResponse,
-  generateText,
-  streamText,
-  type StreamTextOnFinishCallback,
-} from "ai";
+import { generateText, streamText } from "ai";
 import type { ToolSet } from "ai"; // Use type-only import
 
 import { AgentMessageBodySchema, type AgentState } from "@/core/agent/shared";
-
-import { executions, tools } from "./tools";
-import { processToolCalls } from "./utils";
+import { createContext } from "@/core/util/context";
 
 const model = openai("o4-mini-2025-04-16");
 const webSearch: ToolSet = {
@@ -24,8 +15,8 @@ const webSearch: ToolSet = {
   }),
 };
 
-// we use async local storage to expose the agent context to the tools
-export const agentContext = new AsyncLocalStorage<DevResearchAgent>();
+// we use createContext to expose the agent context to the tools
+export const agentContext = createContext<DevResearchAgent>();
 /**
  * Chat Agent implementation that handles real-time AI chat interactions
  */
