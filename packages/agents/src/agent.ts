@@ -9,13 +9,20 @@ import {
   streamText,
   type StreamTextOnFinishCallback,
 } from "ai";
+import type { ToolSet } from "ai"; // Use type-only import
 
 import { AgentMessageBodySchema, type AgentState } from "@/core/agent/shared";
 
 import { executions, tools } from "./tools";
 import { processToolCalls } from "./utils";
 
-const model = openai("gpt-4o-2024-11-20");
+const model = openai("o4-mini-2025-04-16");
+const webSearch: ToolSet = {
+  web_search_preview: openai.tools.webSearchPreview({
+    // optional configuration:
+    searchContextSize: "high",
+  }),
+};
 
 // we use async local storage to expose the agent context to the tools
 export const agentContext = new AsyncLocalStorage<DevResearchAgent>();
@@ -26,6 +33,9 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
   initialState: AgentState = {
     status: "inactive",
   };
+  onStateUpdate(state: AgentState, source: Connection | "server") {
+    console.log("State updated:", state);
+  }
   onConnect(connection: Connection) {
     console.log("Client connected:", this.name);
     // connection.send(`Welcome! You are connected with ID: ${connection.id}`);
@@ -50,20 +60,22 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     // TODO: abstract and clean this up
     let title;
     try {
-      // Use generateText from the AI SDK (non-streaming approach)
       const { text: titleText } = await generateText({
         model,
-        system: "You are a helpful assistant that creates concise, descriptive titles.",
-        messages: [{
-          role: "user",
-          content: `Create a short, descriptive title (5-7 words max) for a research task with this prompt: "${data.prompt}"`
-        }],
+        system:
+          "You are a helpful assistant that creates concise, descriptive titles.",
+        messages: [
+          {
+            role: "user",
+            content: `Create a short, descriptive title (5-7 words max) for a research task with this prompt: "${data.prompt}"`,
+          },
+        ],
         temperature: 0.7,
-        maxTokens: 50
+        maxTokens: 50,
       });
 
       // Clean up the title
-      title = titleText.trim().replace(/^["']|["']$/g, '');
+      title = titleText.trim().replace(/^["']|["']$/g, "");
       if (!title) {
         title = `Research Agent #${this.name}`; // Fallback if empty
       }
@@ -92,46 +104,6 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
    * @param onFinish - Callback function executed when streaming completes
    */
 
-  async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>) {
-    // Create a streaming response that handles both text and tool outputs
-    return agentContext.run(this, async () => {
-      const dataStreamResponse = createDataStreamResponse({
-        execute: async (dataStream) => {
-          // Process any pending tool calls from previous messages
-          // This handles human-in-the-loop confirmations for tools
-          const processedMessages = await processToolCalls({
-            messages: this.messages,
-            dataStream,
-            tools,
-            executions,
-          });
-
-          // Stream the AI response using GPT-4
-          const result = streamText({
-            model,
-            system: `You are a helpful assistant that can do various tasks...
-
-${unstable_getSchedulePrompt({ date: new Date() })}
-
-If the user asks to schedule a task, use the schedule tool to schedule the task.
-`,
-            messages: processedMessages,
-            tools,
-            onFinish,
-            onError: (error) => {
-              console.error("Error while streaming:", error);
-            },
-            maxSteps: 10,
-          });
-
-          // Merge the AI response stream with tool execution outputs
-          result.mergeIntoDataStream(dataStream);
-        },
-      });
-
-      return dataStreamResponse;
-    });
-  }
   /**
    * Starts the research process and generates steps
    * @param data - Data passed to the task, including the initial prompt and GitHub URL
@@ -141,25 +113,65 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
     const currentState = this.state;
     if (currentState.status !== "running") return;
 
-    // Generate initial research steps
-    const initialSteps = [
-      {
-        stepTitle: "Research Initialization",
-        details:
-          "Analyzing prompt and preparing research strategy based on: " +
-          data.prompt,
-      },
-      {
-        stepTitle: "Gathering Initial Information",
-        details: `Collecting relevant information from GitHub profile: ${data.htmlUrl}`,
-      },
-    ];
+    // Create an initial research step with empty details that will be populated by streaming
+    const initialStep = {
+      stepTitle: "Analyzing Developer Profile",
+      details: "", // Will be filled incrementally during streaming
+    };
 
-    // Update agent state with initial steps
+    // Update agent state with initial empty step
     this.setState({
       ...currentState,
-      steps: initialSteps,
+      steps: [initialStep],
     });
+
+    // Variable to track the complete response
+    try {
+      // Use streamText to get a streaming response from the LLM
+      const result = await streamText({
+        model,
+        system:
+          "You are an AI assistant that specializes in analyzing GitHub profiles and providing detailed insights about developers. Focus on technical skills, project history, and coding patterns.",
+        tools: webSearch,
+        toolChoice: "required",
+        messages: [
+          {
+            role: "user",
+            content: `Please analyze this developer profile: ${data.htmlUrl}\n\nPrompt: ${data.prompt}\n\nProvide a detailed analysis of their development experience, technical skills, and project history. Include relevant insights about their expertise and coding patterns.`,
+          },
+        ],
+        // onFinish: ({ text }) => {
+        //   // When finished, ensure we have the complete text
+        //   const currentState = this.state;
+        //   if (currentState.status !== "running") return;
+
+        //   // Update the step with the final complete text
+        //   const steps = [...currentState.steps];
+        //   if (steps.length > 0) {
+        //     steps[0] = {
+        //       stepTitle: "Starting research...",
+        //       details: text,
+        //     };
+
+        //     this.setState({
+        //       ...currentState,
+        //       steps,
+        //     });
+        //   }
+        // },
+      });
+      // TODO
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("Error in startResearch:", errorMessage);
+
+      // Add an error note to the steps
+      this.addResearchStep({
+        stepTitle: "Error when starting research",
+        details: `An error occurred during research: ${errorMessage}`,
+      });
+    }
   }
 
   /**
