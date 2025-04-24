@@ -7,6 +7,7 @@ import {
   type AgentState,
 } from "@/core/agent/shared";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCursorAnimation } from "@/hooks/useCursorAnimation";
 
 interface ResearchResultProps {
   nanoId: string;
@@ -116,6 +117,9 @@ function RunningAgentResult({
     isConnected: false,
     isLoading: false,
   };
+  const { cursor, cursorClassName, showCursor } = useCursorAnimation({
+    cursorStyle: "_",
+  });
 
   useEffect(() => {
     const start = new Date(initiatedAt).getTime();
@@ -141,7 +145,7 @@ function RunningAgentResult({
         <h3 className="mb-4 text-2xl font-semibold">{title}</h3>
         <Card>
           <CardContent className="whitespace-pre-wrap py-4 text-left">
-            {log}
+            {log}<span className={cursorClassName}>{showCursor ? cursor : ""}</span>
           </CardContent>
         </Card>
       </div>

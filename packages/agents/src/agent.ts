@@ -73,6 +73,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
   }
   async research() {
     try {
+      const exa = new Exa(this.env.EXA_API_KEY);
       if (this.state.status !== "running") {
         this.appendLog("Agent is not running, terminating startResearch");
         return;
@@ -110,7 +111,6 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
       this.appendLog("Getting user's pinned repos...");
       const pinnedRepos = await fetchPinnedRepos(this.state.githubUsername);
       if (pinnedRepos.length > 0) {
-        const exa = new Exa(this.env.EXA_API_KEY);
         this.appendFindings({
           newInfo: "## Pinned Repos",
           message: "Successfully fetched pinned repos",
@@ -157,6 +157,18 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     } catch (error) {
       console.error("Error: ", error);
       this.appendLog(`Error fetching user info: ${error}`);
+    }
+  }
+  async completeResearch() {
+    try {
+      if (this.state.status !== "running") {
+        this.appendLog("Agent is not running, terminating completeResearch");
+        return;
+      }
+      
+    } catch (error) {
+      console.error("Error: ", error);
+      this.appendLog(`Error completing research: ${error}`);
     }
   }
 
