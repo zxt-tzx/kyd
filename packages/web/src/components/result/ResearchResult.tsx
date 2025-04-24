@@ -143,7 +143,7 @@ function RunningAgentResult({
         <span className="mx-2 inline-flex items-center">
           <span className="text-muted-foreground">Connection: </span>
           <div
-            className={`mx-2 size-3 rounded-full ${isLoading ? "bg-amber-500" : isConnected ? "bg-primary" : "bg-destructive"}`}
+            className={`mx-2 size-3 rounded-full ${isLoading ? "bg-amber-500" : isConnected ? "bg-green-500" : "bg-red-500"}`}
           />
         </span>
         <span>{elapsedTime}s</span>
