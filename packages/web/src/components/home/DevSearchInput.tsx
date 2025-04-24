@@ -1,16 +1,23 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 
-import { githubUsernameSubmitSchema } from "@/core/github/schema.validation";
+import { devSearchSubmitSchema } from "@/core/github/schema.validation";
 import { fetchUser, IS_USER_MESSAGE, isUser } from "@/core/github/user";
 import { useCursorAnimation } from "@/hooks/useCursorAnimation";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   UserPreview,
   UserPreviewSkeleton,
 } from "@/components/users/UserPreview";
 import { ValidationErrors } from "@/components/ValidationErrors";
+
+const PROMPT_SUGGESTIONS = [
+  "I am a founder hiring a full-stack dev",
+  "I am a VC evaluating this technical founder",
+  "I am an EM looking for a systems programmer",
+];
 
 export function DevSearchInput() {
   const [isFocused, setIsFocused] = useState(false);
@@ -20,7 +27,9 @@ export function DevSearchInput() {
   const [error, setError] = useState<string | null>(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
+  const [selectedPrompt, setSelectedPrompt] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const promptInputRef = useRef<HTMLTextAreaElement>(null);
 
   const { cursor, cursorClassName, showCursor } = useCursorAnimation({
     cursorStyle: "_",
@@ -28,10 +37,11 @@ export function DevSearchInput() {
 
   const form = useForm({
     defaultValues: {
-      input: "",
+      githubInput: "",
+      promptInput: "",
     },
     onSubmit: async ({ value }) => {
-      const result = githubUsernameSubmitSchema.safeParse(value);
+      const result = devSearchSubmitSchema.safeParse(value);
       if (!result.success) {
         setError(result.error.errors[0]?.message ?? "Invalid GitHub username");
         setPreview(null);
@@ -40,7 +50,7 @@ export function DevSearchInput() {
       try {
         setError(null);
         setIsLoadingPreview(true);
-        const user = await fetchUser(result.data);
+        const user = await fetchUser(result.data.username);
         if (!isUser(user)) {
           throw new Error(IS_USER_MESSAGE);
         }
@@ -59,9 +69,16 @@ export function DevSearchInput() {
   const handleCancel = () => {
     form.reset();
     setPreview(null);
+    setSelectedPrompt("");
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
+  };
+
+  const handlePromptSelect = (prompt: string) => {
+    // Update the input field directly through the form field
+    form.setFieldValue("promptInput", prompt);
+    setSelectedPrompt(prompt);
   };
 
   return (
@@ -81,7 +98,7 @@ export function DevSearchInput() {
         </Label>
 
         <form.Field
-          name="input"
+          name="githubInput"
           children={(field) => (
             <div className="grid gap-2">
               <div className="relative">
@@ -109,17 +126,18 @@ export function DevSearchInput() {
                 />
                 <div className="pointer-events-none absolute inset-0 flex items-center px-3 text-lg">
                   <pre className="m-0 whitespace-pre p-0 text-[16px] text-foreground">
-                    {form.state.values.input.slice(0, cursorPosition)}
+                    {form.state.values.githubInput.slice(0, cursorPosition)}
                     {isFocused ? (
                       <span className={cursorClassName}>
                         {showCursor
                           ? cursor
-                          : (form.state.values.input[cursorPosition] ?? "")}
+                          : (form.state.values.githubInput[cursorPosition] ??
+                            "")}
                       </span>
                     ) : (
-                      (form.state.values.input[cursorPosition] ?? "")
+                      (form.state.values.githubInput[cursorPosition] ?? "")
                     )}
-                    {form.state.values.input.slice(cursorPosition + 1)}
+                    {form.state.values.githubInput.slice(cursorPosition + 1)}
                   </pre>
                 </div>
               </div>
@@ -127,6 +145,43 @@ export function DevSearchInput() {
             </div>
           )}
         />
+
+        <div className="mt-4">
+          <Label htmlFor="prompt-input" className="block text-left text-lg">
+            What are you looking for? (Optional)
+          </Label>
+          <form.Field
+            name="promptInput"
+            children={(field) => (
+              <div className="grid gap-2">
+                <Textarea
+                  ref={promptInputRef}
+                  id="prompt-input"
+                  className="min-h-[100px] border border-primary text-lg"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    setSelectedPrompt("");
+                  }}
+                  placeholder="Describe your research needs or select from suggestions below"
+                />
+              </div>
+            )}
+          />
+
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {PROMPT_SUGGESTIONS.map((prompt) => (
+              <button
+                key={prompt}
+                type="button"
+                className={`rounded-md px-3 py-1 text-sm ${selectedPrompt === prompt ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
+                onClick={() => handlePromptSelect(prompt)}
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        </div>
       </form>
 
       {isLoadingPreview && <UserPreviewSkeleton />}

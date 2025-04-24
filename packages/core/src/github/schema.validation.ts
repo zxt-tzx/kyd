@@ -123,3 +123,39 @@ export const githubUsernameSubmitSchema = z
     if (!result) return z.NEVER;
     return result;
   });
+
+// Schema for custom prompt input
+export const promptSchema = z
+  .string()
+  .min(1, "Please enter a prompt")
+  .max(200, "Prompt is too long, please keep it under 200 characters");
+
+// Single shared schema for both frontend and backend
+export const researchInputSchema = z.object({
+  username: z.string().transform((input, ctx) => {
+    const username = validateAndExtractGithubUsername(input, ctx);
+    if (!username) return z.NEVER;
+    return username;
+  }),
+  prompt: promptSchema.optional(),
+});
+
+// For frontend form submission - uses the same schema with renamed fields
+export const devSearchSubmitSchema = z.object({
+  githubInput: z.string(),
+  promptInput: z.string().optional(),
+}).transform((data, ctx) => {
+  // Validate using the same schema logic
+  const result = researchInputSchema.safeParse({
+    username: data.githubInput,
+    prompt: data.promptInput,
+  });
+  
+  if (!result.success) {
+    // Copy over errors
+    result.error.errors.forEach(err => ctx.addIssue(err));
+    return z.NEVER;
+  }
+  
+  return result.data;
+});
