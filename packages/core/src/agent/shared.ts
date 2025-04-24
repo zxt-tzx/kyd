@@ -11,6 +11,7 @@ const AgentActiveStateBase = z.object({
 });
 
 export const AgentStateSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("loading") }),
   z.object({ status: z.literal("inactive") }),
   AgentActiveStateBase.extend({
     status: z.literal("running"),

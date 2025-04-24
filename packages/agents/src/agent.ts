@@ -181,7 +181,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
               FINDINGS:
               ${this.state.findings}
 
-              Your report should be well-structured with clear sections, professional tone, and actionable insights. Focus on addressing the original research prompt directly.
+              Your report should be well-structured with clear sections, professional tone, and actionable insights. Focus on addressing the original research prompt directly. Avoid using emojis and progress bars as this breaks formatting. Tables are fine.
             `,
           },
         ],

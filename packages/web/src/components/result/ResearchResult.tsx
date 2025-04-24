@@ -29,7 +29,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [agentState, setAgentState] = useState<AgentState>({
-    status: "inactive",
+    status: "loading",
   });
   const _agent = useAgent({
     ...getAgentClientFetchOpts({
@@ -74,7 +74,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
         <div className="relative flex w-full justify-center pt-28">
           <div className="w-full max-w-screen-xl px-4 text-center">
             {/* Render based on agentState.status */}
-            {agentState.status === "inactive" && <InactiveAgentResult />}
+            {/* {agentState.status === "inactive" && <InactiveAgentResult />} */}
             {agentState.status === "running" && (
               <RunningAgentResult
                 title={agentState.title}

@@ -1,6 +1,6 @@
 import type React from "react";
 
-import { Card, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function ResearchResultView({
@@ -42,36 +42,43 @@ export function ResearchResultSkeleton({
   return (
     <div className="relative flex w-full justify-center pt-28">
       <div className="w-full max-w-screen-xl px-4 text-center">
-        <h1 className="mb-8 text-5xl tracking-tight">Loading Research</h1>
-        <h2 className="mb-8 text-xl text-gray-600">
+        {/* Title Skeleton */}
+        <div className="mb-8 flex justify-center">
+          <Skeleton className="h-12 w-72" />
+        </div>
+
+        {/* Status line Skeleton */}
+        <div className="mb-8 flex items-center justify-center">
           <span className="mx-2 inline-flex items-center">
-            <span className="text-gray-600">Connection: </span>
+            <Skeleton className="mr-2 h-5 w-28" />
             <div
               className={`mx-2 size-3 rounded-full ${
                 isLoading
                   ? "bg-amber-500"
                   : isConnected
-                    ? "bg-green-500"
-                    : "bg-red-500"
+                    ? "bg-primary"
+                    : "bg-destructive"
               }`}
             />
           </span>
           <Skeleton className="inline-block h-6 w-12" />
-        </h2>
+        </div>
 
         {/* Research Steps Skeleton */}
         <div className="mx-auto mb-8 max-w-3xl">
-          <h3 className="mb-4 text-center text-2xl font-semibold">
-            <Skeleton className="mx-auto h-8 w-48" />
-          </h3>
-          <Card className="mb-2 w-full">
+          {/* Title Skeleton */}
+          <div className="mb-4 flex justify-center">
+            <Skeleton className="h-8 w-full max-w-md" />
+          </div>
+
+          {/* Card with content skeleton */}
+          <Card>
             <CardContent className="whitespace-pre-wrap py-4 text-left">
-              <Skeleton className="h-24 w-full" />
-            </CardContent>
-          </Card>
-          <Card className="mb-2 w-full">
-            <CardContent className="whitespace-pre-wrap py-4 text-left">
-              <Skeleton className="h-24 w-full" />
+              <Skeleton className="mb-2 h-6 w-3/4" />
+              <Skeleton className="mb-2 h-6 w-2/3" />
+              <Skeleton className="mb-2 h-6 w-5/6" />
+              <Skeleton className="mb-2 h-6 w-1/2" />
+              <Skeleton className="h-6 w-4/5" />
             </CardContent>
           </Card>
         </div>
@@ -83,12 +90,13 @@ export function ResearchResultSkeleton({
 export function NotFoundView() {
   return (
     <div className="relative flex w-full justify-center pt-28">
-      <div className="w-full max-w-screen-md px-4 text-center">
-        <h1 className="mb-8 text-5xl tracking-tight">Research Not Found</h1>
-        <p className="mb-8 text-xl text-gray-600">
-          The research you&apos;re looking for doesn&apos;t exist. Please check
-          your URL.
-        </p>
+      <div className="w-full max-w-screen-xl px-4 text-center">
+        <h1 className="mb-8 text-5xl tracking-tight">
+          Inactive Research Agent
+        </h1>
+        <h2 className="mb-8 text-xl text-muted-foreground">
+          Please check your URL
+        </h2>
         <a
           href="/"
           className="inline-block rounded-md bg-blue-500 px-6 py-3 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
