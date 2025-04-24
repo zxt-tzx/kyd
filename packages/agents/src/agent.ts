@@ -2,15 +2,14 @@ import { getAgentByName, routeAgentRequest, type Connection } from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
 import { generateText } from "ai";
 import dedent from "dedent";
-import { Exa } from "exa-js";
 
 import { AgentMessageBodySchema, type AgentState } from "@/core/agent/shared";
 import { fetchPinnedRepos } from "@/core/github/pinned";
 import { getRestOctokit } from "@/core/github/shared";
 import { createContext } from "@/core/util/context";
 
-import { smallQuickModel, workhorseModel } from "./models";
-import { extractInfoFromWebsite } from "./research";
+import { bigReasoningModel, smallQuickModel, workhorseModel } from "./models";
+import { extractFromGithubRepo } from "./research";
 
 export const agentContext = createContext<DevResearchAgent>();
 /**
@@ -73,7 +72,6 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
   }
   async research() {
     try {
-      const exa = new Exa(this.env.EXA_API_KEY);
       if (this.state.status !== "running") {
         this.appendLog("Agent is not running, terminating startResearch");
         return;
@@ -117,9 +115,8 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
         });
         for (const repo of pinnedRepos) {
           this.appendLog(`Getting info of ${repo.author}/${repo.name}`);
-          const keyRepoInfo = await extractInfoFromWebsite({
+          const keyRepoInfo = await extractFromGithubRepo({
             url: repo.url,
-            exa,
             model: workhorseModel,
             instructions: {
               whatThisIs: `This is a repo pinned by ${this.state.githubUsername} and the purpose of this analysis is summarized in this prompt: ${this.state.prompt}`,
@@ -165,7 +162,38 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
         this.appendLog("Agent is not running, terminating completeResearch");
         return;
       }
-      
+
+      this.appendLog("Generating final research report...");
+
+      const { text: report } = await generateText({
+        model: bigReasoningModel,
+        system:
+          "You are a professional researcher that synthesizes information into clear, well-organized reports.",
+        messages: [
+          {
+            role: "user",
+            content: dedent`
+              Based on the following research prompt and findings, create a comprehensive research report in markdown format.
+              
+              PROMPT: ${this.state.prompt}
+              
+              FINDINGS:
+              ${this.state.findings}
+              
+              Your report should be well-structured with clear sections, professional tone, and actionable insights. Focus on addressing the original research prompt directly.
+            `,
+          },
+        ],
+        temperature: 0.2,
+      });
+
+      this.appendLog("Research report generated successfully");
+
+      this.setState({
+        ...this.state,
+        report,
+        status: "complete",
+      });
     } catch (error) {
       console.error("Error: ", error);
       this.appendLog(`Error completing research: ${error}`);

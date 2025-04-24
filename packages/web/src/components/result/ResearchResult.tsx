@@ -1,5 +1,7 @@
 import { useAgent } from "agents/react";
 import { createContext, useContext, useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import {
   AgentStateSchema,
@@ -81,7 +83,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
             {agentState.status === "complete" && (
               <CompleteAgentResult
                 title={agentState.title}
-                log={agentState.log}
+                report={agentState.report || ""}
               />
             )}
           </div>
@@ -153,7 +155,13 @@ function RunningAgentResult({
   );
 }
 
-function CompleteAgentResult({ title, log }: { title: string; log: string }) {
+function CompleteAgentResult({ 
+  title, 
+  report 
+}: { 
+  title: string; 
+  report: string 
+}) {
   return (
     <>
       <h1 className="mb-8 text-5xl tracking-tight">Research Complete</h1>
@@ -163,8 +171,10 @@ function CompleteAgentResult({ title, log }: { title: string; log: string }) {
       <div className="mx-auto mb-8 max-w-3xl">
         <h3 className="mb-4 text-2xl font-semibold">{title}</h3>
         <Card className="font-sans">
-          <CardContent className="whitespace-pre-wrap py-4 text-left">
-            {log}
+          <CardContent className="prose prose-sm max-w-none py-6 text-left dark:prose-invert">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {report}
+            </ReactMarkdown>
           </CardContent>
         </Card>
       </div>
