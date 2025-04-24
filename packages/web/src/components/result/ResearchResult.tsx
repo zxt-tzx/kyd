@@ -86,6 +86,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
               <CompleteAgentResult
                 title={agentState.title}
                 report={agentState.report || ""}
+                user={agentState.githubUsername}
               />
             )}
           </div>
@@ -99,7 +100,9 @@ function InactiveAgentResult() {
   return (
     <>
       <h1 className="mb-8 text-5xl tracking-tight">Inactive Research Agent</h1>
-      <h2 className="mb-8 text-xl text-gray-600">Please check your URL</h2>
+      <h2 className="mb-8 text-xl text-muted-foreground">
+        Please check your URL
+      </h2>
     </>
   );
 }
@@ -136,11 +139,11 @@ function RunningAgentResult({
   return (
     <>
       <h1 className="mb-8 text-5xl tracking-tight">Researching Dev...</h1>
-      <h2 className="mb-8 text-xl text-gray-600">
+      <h2 className="mb-8 text-xl text-muted-foreground">
         <span className="mx-2 inline-flex items-center">
-          <span className="text-gray-600">Connection: </span>
+          <span className="text-muted-foreground">Connection: </span>
           <div
-            className={`mx-2 size-3 rounded-full ${isLoading ? "bg-amber-500" : isConnected ? "bg-green-500" : "bg-red-500"}`}
+            className={`mx-2 size-3 rounded-full ${isLoading ? "bg-amber-500" : isConnected ? "bg-primary" : "bg-destructive"}`}
           />
         </span>
         <span>{elapsedTime}s</span>
@@ -161,9 +164,11 @@ function RunningAgentResult({
 function CompleteAgentResult({
   title,
   report,
+  user,
 }: {
   title: string;
   report: string;
+  user?: string;
 }) {
   // Remove any triple backticks markdown fences at the beginning and end of the report
   const cleanReport = report
@@ -173,16 +178,28 @@ function CompleteAgentResult({
 
   return (
     <>
-      <h1 className="mb-8 text-5xl tracking-tight text-green-500">
+      <h1 className="mb-8 text-5xl tracking-tight text-primary">
         Research Complete
       </h1>
-      <h2 className="mb-8 text-xl text-gray-600">
+      <h2 className="mb-8 text-xl text-muted-foreground">
         Here is what we know about your dev
       </h2>
       <div className="mx-auto mb-8 max-w-3xl">
-        <h3 className="mb-4 text-2xl font-semibold text-green-500">{title}</h3>
-        <Card className="border border-green-500/20 bg-gray-950 font-sans">
-          <CardContent className="py-6 text-left">
+        <h3 className="mb-4 text-2xl font-semibold text-primary">{title}</h3>
+        {user && (
+          <div className="mb-6">
+            <h4 className="mb-2 text-lg font-semibold text-accent-foreground">
+              GitHub Contributions
+            </h4>
+            <img
+              src={`https://ghchart.rshah.org/${user}`}
+              alt={`${user}'s GitHub Contributions Chart`}
+              className="mx-auto"
+            />
+          </div>
+        )}
+        <Card className="border border-primary/20 bg-card">
+          <CardContent className="py-6 text-left font-sans">
             {/* Terminal-style HTML markdown rendering with custom styling */}
             <div className="terminal-markdown">
               <ReactMarkdown
@@ -191,7 +208,7 @@ function CompleteAgentResult({
                   // Headings with terminal-style formatting
                   h1: ({ children, ...props }) => (
                     <h1
-                      className="my-4 font-mono text-xl font-bold text-green-500"
+                      className="my-4  text-xl font-bold text-primary"
                       {...props}
                     >
                       {children}
@@ -199,71 +216,59 @@ function CompleteAgentResult({
                   ),
                   h2: ({ children, ...props }) => (
                     <h2
-                      className="my-3 font-mono text-lg font-bold text-green-500"
+                      className="my-3  text-lg font-bold text-primary"
                       {...props}
                     >
                       {children}
                     </h2>
                   ),
                   h3: ({ children, ...props }) => (
-                    <h3
-                      className="my-2 font-mono font-bold text-green-500"
-                      {...props}
-                    >
+                    <h3 className="my-2  font-bold text-primary" {...props}>
                       {children}
                     </h3>
                   ),
                   h4: ({ children, ...props }) => (
-                    <h4
-                      className="font-mono font-bold text-green-500"
-                      {...props}
-                    >
+                    <h4 className=" font-bold text-primary" {...props}>
                       {children}
                     </h4>
                   ),
 
                   // Regular text elements
                   p: ({ children, ...props }) => (
-                    <p className="my-2 font-mono text-green-500" {...props}>
+                    <p className="my-2  text-foreground" {...props}>
                       {children}
                     </p>
                   ),
 
                   // Lists
                   ul: ({ children, ...props }) => (
-                    <ul
-                      className="ml-5 list-disc font-mono text-green-500"
-                      {...props}
-                    >
+                    <ul className="ml-5 list-disc  text-foreground" {...props}>
                       {children}
                     </ul>
                   ),
                   ol: ({ children, ...props }) => (
                     <ol
-                      className="ml-5 list-decimal font-mono text-green-500"
+                      className="ml-5 list-decimal  text-foreground"
                       {...props}
                     >
                       {children}
                     </ol>
                   ),
                   li: ({ children, ...props }) => (
-                    <li className="my-1 font-mono text-green-500" {...props}>
+                    <li className="my-1  text-foreground" {...props}>
                       {children}
                     </li>
                   ),
 
                   // Special elements
                   a: ({ children, ...props }) => (
-                    <a
-                      className="font-mono text-green-300 underline"
-                      {...props}
-                    >
+                    <a className=" text-accent-foreground underline" {...props}>
                       {children}
                     </a>
                   ),
                   blockquote: ({ children, ...props }) => (
                     <blockquote
-                      className="my-2 border-l-4 border-green-700 pl-4 font-mono italic text-green-400"
+                      className="my-2 border-l-4 border-primary/40 pl-4  italic text-muted-foreground"
                       {...props}
                     >
                       {children}
@@ -273,7 +278,7 @@ function CompleteAgentResult({
                   // Code formatting
                   code: ({ children, ...props }) => (
                     <code
-                      className="rounded bg-gray-800 px-1 font-mono text-green-300"
+                      className="rounded bg-muted px-1  text-accent-foreground"
                       {...props}
                     >
                       {children}
@@ -281,7 +286,7 @@ function CompleteAgentResult({
                   ),
                   pre: ({ children, ...props }) => (
                     <pre
-                      className="my-3 overflow-auto rounded bg-gray-900 p-3 font-mono text-green-300"
+                      className="my-3 overflow-auto rounded bg-muted p-3  text-accent-foreground"
                       {...props}
                     >
                       {children}
@@ -291,59 +296,53 @@ function CompleteAgentResult({
                   // Text formatting
                   strong: ({ children, ...props }) => (
                     <strong
-                      className="font-mono font-bold text-green-300"
+                      className=" font-bold text-accent-foreground"
                       {...props}
                     >
                       {children}
                     </strong>
                   ),
                   em: ({ children, ...props }) => (
-                    <em className="font-mono italic text-green-300" {...props}>
+                    <em className=" italic text-accent-foreground" {...props}>
                       {children}
                     </em>
                   ),
 
                   // Other elements
-                  hr: () => <hr className="my-4 border-green-700" />,
+                  hr: () => <hr className="my-4 border-primary/40" />,
 
                   // Tables
                   table: ({ children, ...props }) => (
                     <table
-                      className="my-3 border-collapse font-mono text-green-500"
+                      className="my-3 border-collapse  text-foreground"
                       {...props}
                     >
                       {children}
                     </table>
                   ),
                   thead: ({ children, ...props }) => (
-                    <thead className="font-mono text-green-300" {...props}>
+                    <thead className=" text-accent-foreground" {...props}>
                       {children}
                     </thead>
                   ),
                   tbody: ({ children, ...props }) => (
-                    <tbody className="font-mono text-green-500" {...props}>
+                    <tbody className=" text-foreground" {...props}>
                       {children}
                     </tbody>
                   ),
                   tr: ({ children, ...props }) => (
-                    <tr
-                      className="border-b border-green-900 font-mono"
-                      {...props}
-                    >
+                    <tr className="border-b border-border " {...props}>
                       {children}
                     </tr>
                   ),
                   td: ({ children, ...props }) => (
-                    <td
-                      className="border-r border-green-900 p-2 font-mono"
-                      {...props}
-                    >
+                    <td className="border-r border-border p-2 " {...props}>
                       {children}
                     </td>
                   ),
                   th: ({ children, ...props }) => (
                     <th
-                      className="border-r border-green-900 p-2 font-mono font-bold"
+                      className="border-r border-border p-2  font-bold"
                       {...props}
                     >
                       {children}
