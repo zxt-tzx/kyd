@@ -139,6 +139,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
           });
         }
       }
+      await this.completeResearch();
       const starredRepos =
         await restOctokit.rest.activity.listReposStarredByUser({
           username: this.state.githubUsername,
@@ -174,12 +175,12 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
             role: "user",
             content: dedent`
               Based on the following research prompt and findings, create a comprehensive research report in markdown format.
-              
+
               PROMPT: ${this.state.prompt}
-              
+
               FINDINGS:
               ${this.state.findings}
-              
+
               Your report should be well-structured with clear sections, professional tone, and actionable insights. Focus on addressing the original research prompt directly.
             `,
           },
