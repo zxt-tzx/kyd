@@ -4,12 +4,11 @@ import { generateText } from "ai";
 import dedent from "dedent";
 
 import { AgentMessageBodySchema, type AgentState } from "@/core/agent/shared";
-import { fetchPinnedRepos } from "@/core/github/pinned";
+import { extractFromGithubRepo, fetchPinnedRepos } from "@/core/github/repo";
 import { getRestOctokit } from "@/core/github/shared";
 import { createContext } from "@/core/util/context";
 
 import { bigReasoningModel, smallQuickModel, workhorseModel } from "./models";
-import { extractFromGithubRepo } from "./research";
 
 export const agentContext = createContext<DevResearchAgent>();
 /**
