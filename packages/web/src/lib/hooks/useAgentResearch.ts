@@ -10,7 +10,13 @@ export const useNewResearch = () => {
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: (username: string) => newDevResearch(username),
+    mutationFn: ({
+      username,
+      prompt,
+    }: {
+      username: string;
+      prompt: string | undefined;
+    }) => newDevResearch(username, prompt),
     onSuccess: ({ message, data: { username, nanoId } }) => {
       toast({
         title: `Research on ${username} initiated`,

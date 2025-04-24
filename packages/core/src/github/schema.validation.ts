@@ -113,17 +113,6 @@ export function validateAndExtractGithubUsername(
   return result.data;
 }
 
-// Schema for submission (with transform)
-export const githubUsernameSubmitSchema = z
-  .object({
-    input: z.string(),
-  })
-  .transform((data, ctx) => {
-    const result = validateAndExtractGithubUsername(data.input, ctx);
-    if (!result) return z.NEVER;
-    return result;
-  });
-
 // Schema for custom prompt input
 export const promptSchema = z
   .string()
@@ -150,12 +139,12 @@ export const devSearchSubmitSchema = z.object({
     username: data.githubInput,
     prompt: data.promptInput,
   });
-  
+
   if (!result.success) {
     // Copy over errors
     result.error.errors.forEach(err => ctx.addIssue(err));
     return z.NEVER;
   }
-  
+
   return result.data;
 });

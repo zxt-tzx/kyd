@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 
-import { devSearchSubmitSchema } from "@/core/github/schema.validation";
+import { validateAndExtractGithubUsername } from "@/core/github/schema.validation";
 import { fetchUser, IS_USER_MESSAGE, isUser } from "@/core/github/user";
 import { useCursorAnimation } from "@/hooks/useCursorAnimation";
 import { Input } from "@/components/ui/input";
@@ -41,16 +41,18 @@ export function DevSearchInput() {
       promptInput: "",
     },
     onSubmit: async ({ value }) => {
-      const result = devSearchSubmitSchema.safeParse(value);
-      if (!result.success) {
-        setError(result.error.errors[0]?.message ?? "Invalid GitHub username");
+      // Validate GitHub username using the validation utility
+      const username = validateAndExtractGithubUsername(value.githubInput);
+      if (!username) {
+        setError("Invalid GitHub username");
         setPreview(null);
         return;
       }
+
       try {
         setError(null);
         setIsLoadingPreview(true);
-        const user = await fetchUser(result.data.username);
+        const user = await fetchUser(username);
         if (!isUser(user)) {
           throw new Error(IS_USER_MESSAGE);
         }
@@ -145,60 +147,63 @@ export function DevSearchInput() {
             </div>
           )}
         />
-
-        <div className="mt-4">
-          <Label htmlFor="prompt-input" className="block text-left text-lg">
-            What are you looking for? (Optional)
-          </Label>
-          <form.Field
-            name="promptInput"
-            children={(field) => (
-              <div className="grid gap-2">
-                <Textarea
-                  ref={promptInputRef}
-                  id="prompt-input"
-                  className="min-h-[100px] border border-primary text-lg"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    setSelectedPrompt("");
-                  }}
-                  placeholder="Describe your research needs or select from suggestions below"
-                />
-              </div>
-            )}
-          />
-
-          <div className="mt-6 flex flex-wrap justify-center gap-2">
-            {PROMPT_SUGGESTIONS.map((prompt) => (
-              <button
-                key={prompt}
-                type="button"
-                className={`rounded-md px-3 py-1 text-sm ${selectedPrompt === prompt ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
-                onClick={() => handlePromptSelect(prompt)}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-        </div>
       </form>
 
       {isLoadingPreview && <UserPreviewSkeleton />}
 
       {preview && !isLoadingPreview && (
-        <UserPreview
-          login={preview.login}
-          name={preview.name}
-          email={preview.email}
-          avatarUrl={preview.avatar_url}
-          bio={preview.bio}
-          company={preview.company}
-          location={preview.location}
-          twitterUsername={preview.twitter_username}
-          blog={preview.blog}
-          onCancel={handleCancel}
-        />
+        <>
+          <UserPreview
+            login={preview.login}
+            name={preview.name}
+            email={preview.email}
+            avatarUrl={preview.avatar_url}
+            bio={preview.bio}
+            company={preview.company}
+            location={preview.location}
+            twitterUsername={preview.twitter_username}
+            blog={preview.blog}
+            onCancel={handleCancel}
+            prompt={form.state.values.promptInput}
+          />
+
+          <div className="mt-6">
+            <Label htmlFor="prompt-input" className="block text-left text-lg">
+              What are you looking for? (Optional)
+            </Label>
+            <form.Field
+              name="promptInput"
+              children={(field) => (
+                <div className="grid gap-2">
+                  <Textarea
+                    ref={promptInputRef}
+                    id="prompt-input"
+                    className="min-h-[100px] border border-primary text-lg"
+                    value={field.state.value}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                      setSelectedPrompt("");
+                    }}
+                    placeholder="Describe your research needs or select from suggestions below"
+                  />
+                </div>
+              )}
+            />
+
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {PROMPT_SUGGESTIONS.map((prompt) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  className={`rounded-md px-3 py-1 text-sm ${selectedPrompt === prompt ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
+                  onClick={() => handlePromptSelect(prompt)}
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

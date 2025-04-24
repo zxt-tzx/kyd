@@ -1,4 +1,4 @@
-# Demo at AI Tinkerers Demo
+# Demo at AI Tinkerers Demo on 25 Apr 2025
 
 ## About Me
 
@@ -51,5 +51,6 @@ The agent:
 
 ### Cool stuff
 
-- End-to-end type safety
-- Agent is just TypeScript code
+- End-to-end type safety. Shared code throughout monorepo.
+- Agent is just TypeScript code. Here, you can use the usual agentic frameworks (Vercel AI SDK, LangGraph, Mastra etc.) (Confession: my agent is not really agentic yet because I ran out of time, but it's surprisingly easy to create an agent. [See this](https://aie-feb-25.vercel.app/docs).)
+-

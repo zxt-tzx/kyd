@@ -2,9 +2,12 @@ import { type InferResponseType } from "hono/client";
 
 import { client, handleResponse } from "./client";
 
-export async function newDevResearch(username: string) {
+export async function newDevResearch(
+  username: string,
+  prompt: string | undefined,
+) {
   const res = await client.research.$post({
-    json: { username },
+    json: { username, prompt },
   });
   return handleResponse(res);
 }
