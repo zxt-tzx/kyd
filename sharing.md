@@ -52,5 +52,12 @@ The agent:
 ### Cool stuff
 
 - End-to-end type safety. Shared code throughout monorepo.
-- Agent is just TypeScript code. Here, you can use the usual agentic frameworks (Vercel AI SDK, LangGraph, Mastra etc.) (Confession: my agent is not really agentic yet because I ran out of time, but it's surprisingly easy to create an agent. [See this](https://aie-feb-25.vercel.app/docs).)
+- Agent is just TypeScript code.
+  - Here, you can use the usual agentic frameworks (Vercel AI SDK, LangGraph, Mastra etc.) (Confession: my agent is not really agentic yet because I ran out of time, but it's surprisingly easy to create an agent. [See this](https://aie-feb-25.vercel.app/docs).)
+  - There are many helpful methods you can use to sync state back to your database, including scheduling tasks
+
+## For further exploration
+
+- Build a full AI agent, including HITL and using built-in messages-related hooks
+- If you're running a deterministic workflow, could use Cloudflare Workflow too. Recently GA, works reasonably well
 -

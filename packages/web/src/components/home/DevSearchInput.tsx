@@ -1,7 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 
-import { validateAndExtractGithubUsername } from "@/core/github/schema.validation";
+import {
+  promptSchema,
+  validateAndExtractGithubUsername,
+} from "@/core/github/schema.validation";
 import { fetchUser, IS_USER_MESSAGE, isUser } from "@/core/github/user";
 import { useCursorAnimation } from "@/hooks/useCursorAnimation";
 import { Input } from "@/components/ui/input";
@@ -78,9 +81,13 @@ export function DevSearchInput() {
   };
 
   const handlePromptSelect = (prompt: string) => {
-    // Update the input field directly through the form field
-    form.setFieldValue("promptInput", prompt);
-    setSelectedPrompt(prompt);
+    // Validate with promptSchema first
+    const result = promptSchema.safeParse(prompt);
+    if (result.success) {
+      // Update the input field directly through the form field
+      form.setFieldValue("promptInput", prompt);
+      setSelectedPrompt(prompt);
+    }
   };
 
   return (
@@ -173,6 +180,16 @@ export function DevSearchInput() {
             </Label>
             <form.Field
               name="promptInput"
+              validators={{
+                onChange: ({ value }) => {
+                  if (!value) return undefined;
+                  const result = promptSchema.safeParse(value);
+                  if (!result.success) {
+                    return result.error.message;
+                  }
+                  return undefined;
+                },
+              }}
               children={(field) => (
                 <div className="grid gap-2">
                   <Textarea
@@ -186,6 +203,12 @@ export function DevSearchInput() {
                     }}
                     placeholder="Describe your research needs or select from suggestions below"
                   />
+                  <ValidationErrors field={field} error={null} />
+                  <div
+                    className={`text-right text-xs ${field.state.value && field.state.value.length > 200 ? "text-destructive" : "text-muted-foreground"}`}
+                  >
+                    {field.state.value ? field.state.value.length : 0}/200
+                  </div>
                 </div>
               )}
             />
