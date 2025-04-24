@@ -173,14 +173,16 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
           {
             role: "user",
             content: dedent`
-              Based on the following research prompt and findings, create a comprehensive research report in markdown format.
+              Based on the following research prompt and findings, create a comprehensive research report in markdown format. Please adhere closely to the provided prompt and format the report to be maximally useful to the
+              <prompt>
+              ${this.state.prompt}
+              </prompt>
 
-              PROMPT: ${this.state.prompt}
-
-              FINDINGS:
+              <findings>
               ${this.state.findings}
+              </findings>
 
-              Your report should be well-structured with clear sections, professional tone, and actionable insights. Focus on addressing the original research prompt directly. Avoid using emojis and progress bars as this breaks formatting. Tables are fine.
+              Your report should be well-structured with clear sections, professional tone, and actionable insights, in accordance with the prompt. Avoid using emojis and progress bars as this breaks formatting. Tables are fine.
             `,
           },
         ],
