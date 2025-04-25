@@ -108,12 +108,17 @@ That said, it's not all sunshine ☀️ and rainbows 🌈:
 
 - In general, would not recommend full-stack Cloudflare.
   - Compared to traditional cloud providers (AWS, GCP), it's not as mature
-  - Fully serverless stack is probably still a dream (especially for storage layer)
+  - Fully serverless + global stack is probably still a dream (especially for storage layer)
 - Cloudflare has many interesting, LLM-relevant products:
   - Durable Objects is very interesting
+    - Billed for compute only when DO is active ("serverless")
+    - Cloudflare prices are generally quite competitive as they own their own infra
+  - Possibilities unlocked by DO:
     - Remote MCP. [Blog post](https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/), [prototype by Sentry](https://github.com/getsentry/sentry-mcp).
     - ["1 database per user" pattern](https://boristane.com/blog/durable-objects-database-per-user/)
   - Cloudflare Workflow is now GA; interesting take on Durable Execution
+
+See this [blog post](https://sunilpai.dev/posts/cloudflare-workers-for-ai-agents/) for more Cloudflare x AI shilling.
 
 ## Further Exploration
 
