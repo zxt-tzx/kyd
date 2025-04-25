@@ -202,11 +202,6 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     }
   }
 
-  /**
-   * Helper method to update the scratchpad with new information
-   * @param newInfo - New information to append to the scratchpad
-   */
-
   appendLog(newInfo: string) {
     if (this.state.status !== "running") return;
     const updatedLog = this.state.log + "\n\n" + newInfo;

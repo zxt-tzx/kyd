@@ -1,4 +1,3 @@
-// taken inspiration from git@github.com:berrysauce/pinned.git
 import type { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { parse, type HTMLElement } from "node-html-parser";
@@ -22,6 +21,7 @@ export type PinnedRepo = z.infer<typeof pinnedRepoSchema>;
  * @returns Array of pinned repository data
  * @throws Error if the user is not found, rate limit is exceeded, or other fetch errors
  */
+// inspired by https://github.com/berrysauce/pinned
 export async function fetchPinnedRepos(
   username: string,
 ): Promise<PinnedRepo[]> {
