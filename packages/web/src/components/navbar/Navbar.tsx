@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { UserSearchIcon } from "lucide-react";
+import { InfoIcon, UserSearchIcon } from "lucide-react";
 
 import { DarkModeToggle } from "@/components/navbar/DarkModeToggle";
 
@@ -29,6 +29,13 @@ export function Navbar() {
         </Link>
       </div>
       <nav className="flex items-center gap-4">
+        <Link 
+          to="/about" 
+          className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+        >
+          <InfoIcon className="size-4" />
+          <span>About</span>
+        </Link>
         <DarkModeToggle />
       </nav>
     </div>

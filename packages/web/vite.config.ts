@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [TanStackRouterVite({}), react()],
+  assetsInclude: ["**/*.md"],
   resolve: {
     alias: {
       "@/core": path.resolve(__dirname, "../core/src"),
