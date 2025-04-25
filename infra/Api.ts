@@ -8,12 +8,6 @@ const apiFn = new sst.aws.Function("ApiFn", {
   runtime: "nodejs22.x",
 });
 
-export const apiUrl = apiFn.url;
-
-export const outputs = {
-  apiFn: apiFn.url,
-};
-
 export const api = new sst.aws.Router("Api", {
   routes: {
     "/*": apiFn.url,
@@ -23,3 +17,7 @@ export const api = new sst.aws.Router("Api", {
     dns: sst.cloudflare.dns(),
   },
 });
+
+export const apiUrl = api.url;
+
+export const outputs = {};

@@ -1,7 +1,5 @@
 import { useAgent } from "agents/react";
-import DOMPurify from "dompurify";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import { createRoot } from "react-dom/client";
+import { createContext, useContext, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 

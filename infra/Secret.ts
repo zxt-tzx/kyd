@@ -21,6 +21,4 @@ export const secret = {
 
 export const allSecrets = Object.values(secret);
 
-export const outputs = {
-  cloudflareSecretKey: cloudflareSecretKey.result,
-};
+export const outputs = {};
