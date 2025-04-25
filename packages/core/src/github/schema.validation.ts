@@ -113,13 +113,40 @@ export function validateAndExtractGithubUsername(
   return result.data;
 }
 
-// Schema for submission (with transform)
-export const githubUsernameSubmitSchema = z
+// Schema for custom prompt input
+export const promptSchema = z
+  .string()
+  .max(200, "Prompt is too long, please keep it under 200 characters")
+  .optional();
+
+// Single shared schema for both frontend and backend
+export const researchInputSchema = z.object({
+  username: z.string().transform((input, ctx) => {
+    const username = validateAndExtractGithubUsername(input, ctx);
+    if (!username) return z.NEVER;
+    return username;
+  }),
+  prompt: promptSchema,
+});
+
+// For frontend form submission - uses the same schema with renamed fields
+export const devSearchSubmitSchema = z
   .object({
-    input: z.string(),
+    githubInput: z.string(),
+    promptInput: z.string().optional(),
   })
   .transform((data, ctx) => {
-    const result = validateAndExtractGithubUsername(data.input, ctx);
-    if (!result) return z.NEVER;
-    return result;
+    // Validate using the same schema logic
+    const result = researchInputSchema.safeParse({
+      username: data.githubInput,
+      prompt: data.promptInput,
+    });
+
+    if (!result.success) {
+      // Copy over errors
+      result.error.errors.forEach((err) => ctx.addIssue(err));
+      return z.NEVER;
+    }
+
+    return result.data;
   });

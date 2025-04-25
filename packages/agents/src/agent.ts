@@ -1,21 +1,15 @@
-import { openai } from "@ai-sdk/openai";
 import { getAgentByName, routeAgentRequest, type Connection } from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
-import { generateText, streamText } from "ai";
-import type { ToolSet } from "ai"; // Use type-only import
+import { generateText } from "ai";
+import dedent from "dedent";
 
 import { AgentMessageBodySchema, type AgentState } from "@/core/agent/shared";
+import { extractFromGithubRepo, fetchPinnedRepos } from "@/core/github/repo";
+import { getRestOctokit } from "@/core/github/shared";
 import { createContext } from "@/core/util/context";
 
-const model = openai("o4-mini-2025-04-16");
-const webSearch: ToolSet = {
-  web_search_preview: openai.tools.webSearchPreview({
-    // optional configuration:
-    searchContextSize: "high",
-  }),
-};
+import { bigReasoningModel, smallQuickModel, workhorseModel } from "./models";
 
-// we use createContext to expose the agent context to the tools
 export const agentContext = createContext<DevResearchAgent>();
 /**
  * Chat Agent implementation that handles real-time AI chat interactions
@@ -25,11 +19,10 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     status: "inactive",
   };
   onStateUpdate(state: AgentState, source: Connection | "server") {
-    console.log("State updated:", state);
+    // console.log("State updated:", state);
   }
   onConnect(connection: Connection) {
     console.log("Client connected:", this.name);
-    // connection.send(`Welcome! You are connected with ID: ${connection.id}`);
   }
 
   onClose(connection: Connection) {
@@ -47,155 +40,192 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
       },
     );
   }
-  async initialize(data: { prompt: string; htmlUrl: string }) {
-    // TODO: abstract and clean this up
-    let title;
-    try {
-      const { text: titleText } = await generateText({
-        model,
-        system:
-          "You are a helpful assistant that creates concise, descriptive titles.",
-        messages: [
-          {
-            role: "user",
-            content: `Create a short, descriptive title (5-7 words max) for a research task with this prompt: "${data.prompt}"`,
-          },
-        ],
-        temperature: 0.7,
-        maxTokens: 50,
-      });
-
-      // Clean up the title
-      title = titleText.trim().replace(/^["']|["']$/g, "");
-      if (!title) {
-        title = `Research Agent #${this.name}`; // Fallback if empty
-      }
-    } catch (error) {
-      console.error("Error generating title:", error);
-      title = `Research Agent #${this.name}`; // Fallback on error
-    }
-
+  async initialize(data: { prompt: string; githubUsername: string }) {
+    const { prompt, githubUsername } = data;
+    const { text: title } = await generateText({
+      model: smallQuickModel,
+      system:
+        "You are a helpful assistant that creates concise, descriptive summaries.",
+      messages: [
+        {
+          role: "user",
+          content: `Create a short, descriptive title for a research task with this prompt: "${prompt}"`,
+        },
+      ],
+      temperature: 0.3,
+    });
     this.setState({
+      githubUsername,
+      title,
       status: "running",
-      agentInfo: {
-        initialPrompt: data.prompt,
-        initiatedAt: new Date(),
-        scratchpad: "",
-        title,
-      },
-      steps: [],
+      initiatedAt: new Date(),
+      prompt: data.prompt,
+      findings: `# Key Findings re: ${githubUsername}`,
+      log: `Initializing research of ${githubUsername}...`,
+      report: null,
     });
 
-    await this.startResearch({ prompt: data.prompt, htmlUrl: data.htmlUrl });
+    void this.research();
 
     return { success: true, message: "Agent initialized successfully" };
   }
-  /**
-   * Handles incoming chat messages and manages the response stream
-   * @param onFinish - Callback function executed when streaming completes
-   */
-
-  /**
-   * Starts the research process and generates steps
-   * @param data - Data passed to the task, including the initial prompt and GitHub URL
-   */
-  async startResearch(data: { prompt: string; htmlUrl: string }) {
-    // Starting research process with the provided prompt
-    const currentState = this.state;
-    if (currentState.status !== "running") return;
-
-    // Create an initial research step with empty details that will be populated by streaming
-    const initialStep = {
-      stepTitle: "Analyzing Developer Profile",
-      details: "", // Will be filled incrementally during streaming
-    };
-
-    // Update agent state with initial empty step
-    this.setState({
-      ...currentState,
-      steps: [initialStep],
-    });
-
-    // Variable to track the complete response
+  async research() {
     try {
-      // Use streamText to get a streaming response from the LLM
-      const result = await streamText({
-        model,
+      if (this.state.status !== "running") {
+        this.appendLog("Agent is not running, terminating startResearch");
+        return;
+      }
+      // get basic user info from API
+      this.appendLog("Fetching basic user info...");
+      const restOctokit = getRestOctokit({
+        type: "token",
+        token: this.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+      });
+      const { data: user } = await restOctokit.rest.users.getByUsername({
+        username: this.state.githubUsername,
+      });
+
+      this.appendLog(`Successfully fetched user info`);
+      const basicUserInfo = dedent`
+    ## Basic user info
+    - Login: ${user.login}
+    ${user.name ? `- Name: ${user.name}` : ""}
+    - Joined on ${user.created_at}
+    ${user.company ? `- Company: ${user.company}` : ""}
+    ${user.location ? `- Location: ${user.location}` : ""}
+    ${user.bio ? `- Bio: ${user.bio}` : ""}
+    ${user.hireable !== null ? `- Hireable: ${user.hireable}` : ""}
+    Number of public repos: ${user.public_repos}
+    Number of public gists: ${user.public_gists}
+    Number of followers: ${user.followers}
+    Number of following: ${user.following}
+    `;
+      this.appendFindings({
+        newInfo: basicUserInfo,
+        message: "Adding basic user info to findings...",
+      });
+
+      this.appendLog("Getting user's pinned repos...");
+      const pinnedRepos = await fetchPinnedRepos(this.state.githubUsername);
+      if (pinnedRepos.length > 0) {
+        this.appendFindings({
+          newInfo: "## Pinned Repos",
+          message: "Successfully fetched pinned repos",
+        });
+        for (const repo of pinnedRepos) {
+          this.appendLog(`Getting info of ${repo.author}/${repo.name}`);
+          const keyRepoInfo = await extractFromGithubRepo({
+            url: repo.url,
+            model: workhorseModel,
+            instructions: {
+              whatThisIs: `This is a repo pinned by ${this.state.githubUsername} and the purpose of this analysis is summarized in this prompt: ${this.state.prompt}`,
+              whatToExtract:
+                "Key information about the repo, like the README and description (what the repo does). Maximum of 3 short paragraphs, include the most critical information only.",
+            },
+          });
+          const pinnedRepoInfo = dedent`
+        ### Pinned repo: ${repo.name}
+        - Description: ${repo.description}
+        - Author: ${repo.author}
+        - Language: ${repo.language}
+        ${repo.stars ? `- Stars: ${repo.stars}` : ""}
+        ${repo.forks ? `- Forks: ${repo.forks}` : ""}
+        - Other repo info: ${keyRepoInfo}
+        `;
+          this.appendFindings({
+            newInfo: pinnedRepoInfo,
+            message: "Adding pinned repo info to findings...",
+          });
+        }
+      }
+      await this.completeResearch();
+      const starredRepos =
+        await restOctokit.rest.activity.listReposStarredByUser({
+          username: this.state.githubUsername,
+        });
+      const watchedRepos =
+        await restOctokit.rest.activity.listReposWatchedByUser({
+          username: this.state.githubUsername,
+        });
+
+      const publicGists = await restOctokit.rest.gists.listForUser({
+        username: this.state.githubUsername,
+      });
+    } catch (error) {
+      console.error("Error: ", error);
+      this.appendLog(`Error fetching user info: ${error}`);
+    }
+  }
+  async completeResearch() {
+    try {
+      if (this.state.status !== "running") {
+        this.appendLog("Agent is not running, terminating completeResearch");
+        return;
+      }
+
+      this.appendLog("Generating final research report...");
+
+      const { text: report } = await generateText({
+        model: bigReasoningModel,
         system:
-          "You are an AI assistant that specializes in analyzing GitHub profiles and providing detailed insights about developers. Focus on technical skills, project history, and coding patterns.",
-        tools: webSearch,
-        toolChoice: "required",
+          "You are a professional researcher that synthesizes information into clear, well-organized reports.",
         messages: [
           {
             role: "user",
-            content: `Please analyze this developer profile: ${data.htmlUrl}\n\nPrompt: ${data.prompt}\n\nProvide a detailed analysis of their development experience, technical skills, and project history. Include relevant insights about their expertise and coding patterns.`,
+            content: dedent`
+              Based on the following research prompt and findings, create a comprehensive research report in markdown format. Please adhere closely to the provided prompt and format the report to be maximally useful to the
+              <prompt>
+              ${this.state.prompt}
+              </prompt>
+
+              <findings>
+              ${this.state.findings}
+              </findings>
+
+              Your report should be well-structured with clear sections, professional tone, and actionable insights, in accordance with the prompt. Avoid using emojis and progress bars as this breaks formatting. Tables are fine.
+            `,
           },
         ],
-        // onFinish: ({ text }) => {
-        //   // When finished, ensure we have the complete text
-        //   const currentState = this.state;
-        //   if (currentState.status !== "running") return;
-
-        //   // Update the step with the final complete text
-        //   const steps = [...currentState.steps];
-        //   if (steps.length > 0) {
-        //     steps[0] = {
-        //       stepTitle: "Starting research...",
-        //       details: text,
-        //     };
-
-        //     this.setState({
-        //       ...currentState,
-        //       steps,
-        //     });
-        //   }
-        // },
+        temperature: 0.2,
       });
-      // TODO
+
+      this.appendLog("Research report generated successfully");
+
+      this.setState({
+        ...this.state,
+        report,
+        status: "complete",
+      });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      console.error("Error in startResearch:", errorMessage);
-
-      // Add an error note to the steps
-      this.addResearchStep({
-        stepTitle: "Error when starting research",
-        details: `An error occurred during research: ${errorMessage}`,
-      });
+      console.error("Error: ", error);
+      this.appendLog(`Error completing research: ${error}`);
     }
   }
 
-  /**
-   * Helper method to add a new research step
-   * @param step - The research step to add
-   */
-  addResearchStep(step: { stepTitle: string; details: string }) {
-    const currentState = this.state;
-    if (currentState.status !== "running") return;
-
+  appendLog(newInfo: string) {
+    if (this.state.status !== "running") return;
+    const updatedLog = this.state.log + "\n\n" + newInfo;
+    console.log("Log updated:", newInfo, "\n\n");
     this.setState({
-      ...currentState,
-      steps: [...currentState.steps, step],
+      ...this.state,
+      log: updatedLog,
     });
   }
 
-  /**
-   * Helper method to update the scratchpad with new information
-   * @param newInfo - New information to append to the scratchpad
-   */
-  updateScratchpad(newInfo: string) {
-    const currentState = this.state;
-    if (currentState.status !== "running" || !currentState.agentInfo) return;
-
-    const updatedScratchpad =
-      currentState.agentInfo.scratchpad + "\n\n" + newInfo;
-
+  appendFindings({
+    newInfo,
+    message: logMessage,
+  }: {
+    newInfo: string;
+    message: string;
+  }) {
+    if (this.state.status !== "running") return;
+    console.log("Findings updated:", newInfo, "\n\n");
+    const updatedFindings = this.state.findings + "\n\n" + newInfo;
+    this.appendLog(logMessage);
     this.setState({
-      ...currentState,
-      agentInfo: {
-        ...currentState.agentInfo,
-        scratchpad: updatedScratchpad,
-      },
+      ...this.state,
+      findings: updatedFindings,
     });
   }
 }
@@ -233,11 +263,11 @@ export default {
           if (!agentName) {
             throw new Response("Missing agent name", { status: 400 });
           }
-          const { htmlUrl, prompt } = messageBody;
+          const { githubUsername, prompt } = messageBody;
 
           // Create a stub of the agent to interact with the Durable Object
           const agent = await getAgentByName(env.DevResearchAgent, agentName);
-          await agent.initialize({ htmlUrl, prompt });
+          await agent.initialize({ githubUsername, prompt });
 
           return new Response("Agent initialized successfully", {
             headers: { "Content-Type": "text/plain" },

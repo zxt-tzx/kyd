@@ -24,6 +24,7 @@ export type UserPreviewProps = {
   location: string | null;
   twitterUsername: string | null;
   onCancel: () => void;
+  prompt: string | undefined;
 } & {
   className?: string;
 };
@@ -40,10 +41,10 @@ export function UserPreview({
   twitterUsername,
   onCancel,
   className,
+  prompt,
 }: UserPreviewProps) {
   const researchDevMutation = useNewResearch();
   const isLoading = researchDevMutation.isPending;
-
   return (
     <div
       className={cn(
@@ -118,7 +119,9 @@ export function UserPreview({
           variant="default"
           size="sm"
           className="w-full"
-          onClick={() => researchDevMutation.mutate(login)}
+          onClick={() =>
+            researchDevMutation.mutate({ username: login, prompt })
+          }
           disabled={isLoading}
         >
           {isLoading ? (

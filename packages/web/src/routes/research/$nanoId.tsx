@@ -31,6 +31,9 @@ function AgentView() {
   if (isLoading) {
     return <ResearchResultSkeleton />;
   }
+  if (isConnected && agentStatus === "loading") {
+    return <ResearchResultSkeleton />;
+  }
 
   // Show ErrorMessageView if there's an error message
   if (errorMessage !== null || !isConnected) {

@@ -35,6 +35,11 @@
           }
         ]
       },
+      "observability": {
+        "logs": {
+          "enabled": true
+        }
+      },
       "vars": {
         "ENVIRONMENT": "staging",
         "DEBUG_MODE": "true"
@@ -55,6 +60,11 @@
             "class_name": "DevResearchAgent"
           }
         ]
+      },
+      "observability": {
+        "logs": {
+          "enabled": true
+        }
       },
       "vars": {
         "ENVIRONMENT": "production",

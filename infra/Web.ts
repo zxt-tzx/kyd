@@ -23,6 +23,4 @@ const web = new sst.aws.StaticSite("Web", {
   },
 });
 
-export const outputs = {
-  web: web.url,
-};
+export const outputs = {};

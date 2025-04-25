@@ -14,15 +14,7 @@ declare module "sst" {
       "type": "sst.aws.Function"
       "url": string
     }
-    "BRAVE_API_KEY": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
     "DATABASE_URL": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "DEEPSEEK_API_KEY": {
       "type": "sst.sst.Secret"
       "value": string
     }
@@ -31,10 +23,6 @@ declare module "sst" {
       "type": "sst.sst.Linkable"
     }
     "OPENAI_API_KEY": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "SERPER_API_KEY": {
       "type": "sst.sst.Secret"
       "value": string
     }
