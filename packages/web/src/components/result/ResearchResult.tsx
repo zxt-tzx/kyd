@@ -132,8 +132,9 @@ function RunningAgentResult({
           <div
             className={`mx-2 size-3 rounded-full ${isLoading ? "bg-amber-500" : isConnected ? "bg-green-500" : "bg-red-500"}`}
           />
+          ,
         </span>
-        <span>{elapsedTime}s</span>
+        <span>Running for: {elapsedTime}s</span>
       </h2>
       <div className="mx-auto mb-8 max-w-3xl">
         <h3 className="mb-4 text-2xl font-semibold">{title}</h3>

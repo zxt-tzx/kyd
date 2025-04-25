@@ -26,6 +26,10 @@ export const repoSchema = z
     html_url: z.string().url(),
     private: z.boolean(),
     stargazers_count: z.number(),
+    full_name: z.string().optional(),
+    language: z.string().nullable().optional(),
+    forks_count: z.number().optional(),
+    forks: z.number().optional(),
   })
   .strip();
 
@@ -67,5 +71,12 @@ export const githubUserSchema = z
     created_at: z.string().datetime(),
     updated_at: z.string().datetime(),
     type: z.enum(["User", "Organization"]),
+    language: z.string().nullable().optional(),
+    stargazers_count: z.number().optional(),
+    forks: z.number().optional(),
+    forks_count: z.number().optional(),
+    full_name: z.string().optional(),
+    files: z.record(z.unknown()).optional(),
+    description: z.string().nullable().optional(),
   })
   .strip();

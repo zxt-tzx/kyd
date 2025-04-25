@@ -105,52 +105,162 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
         message: "Adding basic user info to findings...",
       });
 
+      // 1. Pinned repositories
       this.appendLog("Getting user's pinned repos...");
       const pinnedRepos = await fetchPinnedRepos(this.state.githubUsername);
       if (pinnedRepos.length > 0) {
         this.appendFindings({
-          newInfo: "## Pinned Repos",
-          message: "Successfully fetched pinned repos",
+          newInfo: "## Pinned Repositories",
+          message: "Successfully fetched pinned repositories.",
         });
+
+        // Analysing each pinned repo sequentially to avoid API-rate limits
         for (const repo of pinnedRepos) {
-          this.appendLog(`Getting info of ${repo.author}/${repo.name}`);
+          // Safety check – ensure the agent is still running
+          if (this.state.status !== "running") return;
+
+          this.appendLog(
+            `Analysing pinned repo ${repo.author}/${repo.name}...`,
+          );
+
           const keyRepoInfo = await extractFromGithubRepo({
             url: repo.url,
             model: workhorseModel,
             instructions: {
-              whatThisIs: `This is a repo pinned by ${this.state.githubUsername} and the purpose of this analysis is summarized in this prompt: ${this.state.prompt}`,
+              whatThisIs: `This repository is pinned by ${this.state.githubUsername}. The purpose of the overall research is: ${this.state.prompt}`,
               whatToExtract:
-                "Key information about the repo, like the README and description (what the repo does). Maximum of 3 short paragraphs, include the most critical information only.",
+                "Summarise the repository in 2-3 concise paragraphs focusing on its purpose, key technologies and any notable achievements. Do not include code blocks.",
             },
           });
+
           const pinnedRepoInfo = dedent`
-        ### Pinned repo: ${repo.name}
-        - Description: ${repo.description}
-        - Author: ${repo.author}
-        - Language: ${repo.language}
-        ${repo.stars ? `- Stars: ${repo.stars}` : ""}
-        ${repo.forks ? `- Forks: ${repo.forks}` : ""}
-        - Other repo info: ${keyRepoInfo}
-        `;
+            ### ${repo.name}
+            - Description: ${repo.description || "(no description)"}
+            - Owner: ${repo.author}
+            - Primary language: ${repo.language || "Unknown"}
+            ${repo.stars ? `- Stars: ${repo.stars}` : ""}
+            ${repo.forks ? `- Forks: ${repo.forks}` : ""}
+            - Key details: ${keyRepoInfo.trim()}
+          `;
+
           this.appendFindings({
             newInfo: pinnedRepoInfo,
-            message: "Adding pinned repo info to findings...",
+            message: `Added analysis of pinned repo ${repo.name}`,
           });
         }
       }
-      await this.completeResearch();
-      const starredRepos =
+
+      // 2. Starred repositories (top 5 by stargazers count)
+      this.appendLog("Fetching user's starred repositories...");
+      const { data: starredRepos } =
         await restOctokit.rest.activity.listReposStarredByUser({
           username: this.state.githubUsername,
-        });
-      const watchedRepos =
-        await restOctokit.rest.activity.listReposWatchedByUser({
-          username: this.state.githubUsername,
+          per_page: 100,
         });
 
-      const publicGists = await restOctokit.rest.gists.listForUser({
+      if (starredRepos.length > 0) {
+        // Sort by popularity and take the top 5 for a lighter analysis
+        const topStarred = [...starredRepos]
+          .sort((a, b) => {
+            const aCount = 'repo' in a ? a.repo.stargazers_count : a.stargazers_count!;
+            const bCount = 'repo' in b ? b.repo.stargazers_count : b.stargazers_count!;
+            return bCount - aCount;
+          })
+          .slice(0, 5);
+
+        this.appendFindings({
+          newInfo: "## Notable Starred Repositories",
+          message: "Processing top starred repositories...",
+        });
+
+        for (const repo of topStarred) {
+          if (this.state.status !== "running") return;
+
+          const repoData = 'repo' in repo ? repo.repo : repo;
+          const starredInfo = dedent`
+            ### ${repoData.full_name}
+            - Stars: ${repoData.stargazers_count}
+            - Primary language: ${repoData.language || "Unknown"}
+            - Description: ${repoData.description || "(no description)"}
+          `;
+
+          this.appendFindings({
+            newInfo: starredInfo,
+            message: `Added info for starred repo ${repoData.full_name}`,
+          });
+        }
+      }
+
+      // 3. Watched repositories (list first 5)
+      this.appendLog("Fetching user's watched repositories...");
+      const { data: watchedRepos } =
+        await restOctokit.rest.activity.listReposWatchedByUser({
+          username: this.state.githubUsername,
+          per_page: 100,
+        });
+
+      if (watchedRepos.length > 0) {
+        this.appendFindings({
+          newInfo: "## Watched Repositories (sample)",
+          message: "Adding watched repositories to findings...",
+        });
+
+        watchedRepos.slice(0, 5).forEach((repo) => {
+          const watchedInfo = `- ${repo.full_name} (${repo.language || "Unknown"})`;
+          this.appendFindings({
+            newInfo: watchedInfo,
+            message: `Added watched repo ${repo.full_name}`,
+          });
+        });
+      }
+
+      // 4. Public gists (list first 5)
+      this.appendLog("Fetching user's public gists...");
+      const { data: publicGists } = await restOctokit.rest.gists.listForUser({
         username: this.state.githubUsername,
+        per_page: 100,
       });
+
+      if (publicGists.length > 0) {
+        this.appendFindings({
+          newInfo: "## Public Gists (sample)",
+          message: "Adding public gists to findings...",
+        });
+
+        publicGists.slice(0, 5).forEach((gist) => {
+          const gistInfo = `- ${gist.description || "(no description)"} – ${Object.keys(gist.files).length} files`;
+          this.appendFindings({
+            newInfo: gistInfo,
+            message: `Added gist ${gist.id}`,
+          });
+        });
+      }
+
+      // 5. Language usage breakdown across pinned + starred repos
+      const languageCounts: Record<string, number> = {};
+      [...pinnedRepos, ...starredRepos].forEach((repo) => {
+        const repoData = 'repo' in repo ? repo.repo : repo;
+        const lang = repoData.language || "Unknown";
+        languageCounts[lang] = (languageCounts[lang] || 0) + 1;
+      });
+
+      const languageBreakdown = Object.entries(languageCounts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([lang, count]) => `- ${lang}: ${count}`)
+        .join("\n");
+
+      if (languageBreakdown) {
+        this.appendFindings({
+          newInfo: dedent`
+            ## Language Usage Snapshot
+            ${languageBreakdown}
+          `,
+          message: "Added language usage breakdown to findings...",
+        });
+      }
+
+      // All data gathered – generate final report
+      await this.completeResearch();
     } catch (error) {
       console.error("Error: ", error);
       this.appendLog(`Error fetching user info: ${error}`);
@@ -182,7 +292,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
               ${this.state.findings}
               </findings>
 
-              Your report should be well-structured with clear sections, professional tone, and actionable insights, in accordance with the prompt. Avoid using emojis and progress bars as this breaks formatting. Tables are fine.
+              Your report should be well-structured with clear sections, professional tone, and actionable insights, in accordance with the prompt. Avoid using emojis and progress bars as this breaks formatting. Tables are fine. Don't use the \`\`\`markdown\`\`\` tags and avoid "end of report" tags.
             `,
           },
         ],
