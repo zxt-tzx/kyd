@@ -9,6 +9,7 @@ import {
   type AgentState,
 } from "@/core/agent/shared";
 import { useCursorAnimation } from "@/hooks/useCursorAnimation";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface ResearchResultProps {
@@ -78,6 +79,7 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
                 title={agentState.title}
                 initiatedAt={agentState.initiatedAt}
                 log={agentState.log}
+                onStop={() => _agent.send(JSON.stringify({ action: "cancel" }))}
               />
             )}
             {agentState.status === "complete" && (
@@ -98,10 +100,12 @@ function RunningAgentResult({
   title,
   initiatedAt,
   log,
+  onStop,
 }: {
   title: string;
   initiatedAt: string | number | Date;
   log: string;
+  onStop: () => void;
 }) {
   const [elapsedTime, setElapsedTime] = useState(() => {
     const start = new Date(initiatedAt).getTime();
@@ -126,16 +130,25 @@ function RunningAgentResult({
   return (
     <>
       <h1 className="mb-8 text-5xl tracking-tight">Researching Dev...</h1>
-      <h2 className="mb-8 text-xl text-muted-foreground">
-        <span className="mx-2 inline-flex items-center">
+      <div className="mx-auto mb-8 max-w-3xl flex items-center justify-between">
+        <div className="inline-flex items-center text-xl text-muted-foreground w-64">
           <span className="text-muted-foreground">Connection: </span>
           <div
             className={`mx-2 size-3 rounded-full ${isLoading ? "bg-amber-500" : isConnected ? "bg-green-500" : "bg-red-500"}`}
           />
-          ,
-        </span>
-        <span>Running for: {elapsedTime}s</span>
-      </h2>
+        </div>
+        <div className="text-xl text-muted-foreground w-64 text-center">
+          Running for: {elapsedTime}s
+        </div>
+        <div className="w-64 flex justify-end">
+          <Button
+            variant="destructive"
+            onClick={onStop}
+          >
+            Stop Research
+          </Button>
+        </div>
+      </div>
       <div className="mx-auto mb-8 max-w-3xl">
         <h3 className="mb-4 text-2xl font-semibold">{title}</h3>
         <Card>

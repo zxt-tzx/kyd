@@ -29,6 +29,18 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     console.log("Client disconnected:", this.name);
   }
 
+  async onMessage(connection: Connection, message: string) {
+    try {
+      const data = JSON.parse(message);
+      if (data && data.action === "cancel") {
+        this.cancel();
+        return;
+      }
+    } catch {
+      // not JSON or no cancel action; ignore
+    }
+  }
+
   async onRequest(request: Request) {
     const timestamp = new Date().toLocaleTimeString();
     return new Response(
@@ -68,6 +80,16 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
     void this.research();
 
     return { success: true, message: "Agent initialized successfully" };
+  }
+
+  /**
+   * Gracefully cancel running research.
+   */
+  cancel() {
+    if (this.state.status === "running") {
+      this.appendLog("Research cancelled by user.");
+      this.setState({ status: "inactive" });
+    }
   }
   async research() {
     try {
@@ -134,9 +156,8 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
           });
 
           const pinnedRepoInfo = dedent`
-            ### ${repo.name}
+            ### [${repo.author}/${repo.name}](${repo.url})
             - Description: ${repo.description || "(no description)"}
-            - Owner: ${repo.author}
             - Primary language: ${repo.language || "Unknown"}
             ${repo.stars ? `- Stars: ${repo.stars}` : ""}
             ${repo.forks ? `- Forks: ${repo.forks}` : ""}
@@ -148,6 +169,11 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
             message: `Added analysis of pinned repo ${repo.name}`,
           });
         }
+      } else {
+        this.appendFindings({
+          newInfo: "*No pinned repositories found*",
+          message: "No pinned repos found.",
+        });
       }
 
       // 2. Starred repositories (top 5 by stargazers count)
@@ -162,8 +188,10 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
         // Sort by popularity and take the top 5 for a lighter analysis
         const topStarred = [...starredRepos]
           .sort((a, b) => {
-            const aCount = 'repo' in a ? a.repo.stargazers_count : a.stargazers_count!;
-            const bCount = 'repo' in b ? b.repo.stargazers_count : b.stargazers_count!;
+            const aCount =
+              "repo" in a ? a.repo.stargazers_count : a.stargazers_count!;
+            const bCount =
+              "repo" in b ? b.repo.stargazers_count : b.stargazers_count!;
             return bCount - aCount;
           })
           .slice(0, 5);
@@ -176,9 +204,9 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
         for (const repo of topStarred) {
           if (this.state.status !== "running") return;
 
-          const repoData = 'repo' in repo ? repo.repo : repo;
+          const repoData = "repo" in repo ? repo.repo : repo;
           const starredInfo = dedent`
-            ### ${repoData.full_name}
+            ### [${repoData.full_name}](https://github.com/${repoData.full_name})
             - Stars: ${repoData.stargazers_count}
             - Primary language: ${repoData.language || "Unknown"}
             - Description: ${repoData.description || "(no description)"}
@@ -189,6 +217,11 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
             message: `Added info for starred repo ${repoData.full_name}`,
           });
         }
+      } else {
+        this.appendFindings({
+          newInfo: "*No starred repositories found*",
+          message: "No starred repos found.",
+        });
       }
 
       // 3. Watched repositories (list first 5)
@@ -206,11 +239,16 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
         });
 
         watchedRepos.slice(0, 5).forEach((repo) => {
-          const watchedInfo = `- ${repo.full_name} (${repo.language || "Unknown"})`;
+          const watchedInfo = `- [${repo.full_name}](https://github.com/${repo.full_name}) (${repo.language || "Unknown"})`;
           this.appendFindings({
             newInfo: watchedInfo,
             message: `Added watched repo ${repo.full_name}`,
           });
+        });
+      } else {
+        this.appendFindings({
+          newInfo: "*No watched repositories found*",
+          message: "No watched repos found.",
         });
       }
 
@@ -234,12 +272,17 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
             message: `Added gist ${gist.id}`,
           });
         });
+      } else {
+        this.appendFindings({
+          newInfo: "*No public gists found*",
+          message: "No gists found.",
+        });
       }
 
       // 5. Language usage breakdown across pinned + starred repos
       const languageCounts: Record<string, number> = {};
       [...pinnedRepos, ...starredRepos].forEach((repo) => {
-        const repoData = 'repo' in repo ? repo.repo : repo;
+        const repoData = "repo" in repo ? repo.repo : repo;
         const lang = repoData.language || "Unknown";
         languageCounts[lang] = (languageCounts[lang] || 0) + 1;
       });

@@ -1,5 +1,6 @@
 import type React from "react";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -47,9 +48,9 @@ export function ResearchResultSkeleton({
           <Skeleton className="h-12 w-72" />
         </div>
 
-        {/* Status line Skeleton */}
-        <div className="mb-8 flex items-center justify-center">
-          <span className="mx-2 inline-flex items-center">
+        {/* Status line and Stop button Skeleton */}
+        <div className="mx-auto mb-8 max-w-3xl flex items-center justify-between">
+          <div className="inline-flex items-center w-64">
             <Skeleton className="mr-2 h-5 w-28" />
             <div
               className={`mx-2 size-3 rounded-full ${
@@ -60,8 +61,13 @@ export function ResearchResultSkeleton({
                     : "bg-destructive"
               }`}
             />
-          </span>
-          <Skeleton className="inline-block h-6 w-12" />
+          </div>
+          <div className="w-64 text-center">
+            <Skeleton className="h-6 w-32 mx-auto" />
+          </div>
+          <div className="w-64 flex justify-end">
+            <Skeleton className="h-10 w-32" />
+          </div>
         </div>
 
         {/* Research Steps Skeleton */}
@@ -97,12 +103,9 @@ export function NotFoundView() {
         <h2 className="mb-8 text-xl text-muted-foreground">
           Please check your URL
         </h2>
-        <a
-          href="/"
-          className="inline-block rounded-md bg-blue-500 px-6 py-3 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-        >
-          Return Home
-        </a>
+        <Button asChild>
+          <a href="/">Return Home</a>
+        </Button>
       </div>
     </div>
   );
@@ -123,12 +126,9 @@ export function ErrorView({ error }: { error: unknown }) {
           <div className="mb-8 rounded-md bg-red-50 p-4 text-left">
             <p className="text-red-700">{errorMessage}</p>
           </div>
-          <a
-            href="/"
-            className="inline-block rounded-md bg-blue-500 px-6 py-3 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-          >
-            Return Home
-          </a>
+          <Button asChild>
+            <a href="/">Return Home</a>
+          </Button>
         </div>
       </div>
     </div>
@@ -147,12 +147,9 @@ export function ErrorMessageView({ message }: { message: string | null }) {
           <div className="mb-8 rounded-md bg-red-50 p-4 text-left">
             <p className="text-red-700">{message ?? "Something went wrong"}</p>
           </div>
-          <a
-            href="/"
-            className="inline-block rounded-md bg-blue-500 px-6 py-3 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-          >
-            Return Home
-          </a>
+          <Button asChild>
+            <a href="/">Return Home</a>
+          </Button>
         </div>
       </div>
     </div>
