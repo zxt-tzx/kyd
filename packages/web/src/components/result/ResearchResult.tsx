@@ -94,17 +94,6 @@ export function ResearchResult({ nanoId }: ResearchResultProps) {
   };
 }
 
-function InactiveAgentResult() {
-  return (
-    <>
-      <h1 className="mb-8 text-5xl tracking-tight">Inactive Research Agent</h1>
-      <h2 className="mb-8 text-xl text-muted-foreground">
-        Please check your URL
-      </h2>
-    </>
-  );
-}
-
 function RunningAgentResult({
   title,
   initiatedAt,

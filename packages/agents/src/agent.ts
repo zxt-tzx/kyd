@@ -49,7 +49,7 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
       messages: [
         {
           role: "user",
-          content: `Create a short, descriptive title (5-7 words max) for a research task with this prompt: "${prompt}"`,
+          content: `Create a short, descriptive title for a research task with this prompt: "${prompt}"`,
         },
       ],
       temperature: 0.3,
