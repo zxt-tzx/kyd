@@ -1,11 +1,4 @@
-# AI Tinkerers Demo on 25 Apr 2025
-
-## About Me
-
-- Full-stack TypeScript, ex-OGP. [GitHub](https://github.com/zxt-tzx), [LinkedIn](https://www.linkedin.com/in/tan-zixiang/)
-- Quit my job to explore opportunities in AI
-- Big fan of serverless, bullish on AI applications
-- For this project, I want to build a working AI agent and get a sense of how the different pieces fit together in a web app
+# About KYD
 
 ## Tech stack
 
