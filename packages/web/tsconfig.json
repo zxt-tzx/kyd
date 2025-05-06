@@ -24,5 +24,6 @@
     {
       "path": "../functions"
     }
-  ]
+  ],
+  "include": ["./src/**/*", "./sst-env.d.ts", "../../reset.d.ts"]
 }

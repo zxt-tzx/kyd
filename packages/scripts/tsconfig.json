@@ -13,5 +13,6 @@
     {
       "path": "../core"
     }
-  ]
+  ],
+  "include": ["./src/**/*", "../../reset.d.ts"]
 }

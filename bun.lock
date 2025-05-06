@@ -10,6 +10,7 @@
         "@eslint/compat": "^1.2.0",
         "@eslint/js": "^9.12.0",
         "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+        "@total-typescript/ts-reset": "^0.6.1",
         "@types/bun": "latest",
         "concurrently": "^8.2.2",
         "eslint": "^9.12.0",
@@ -681,6 +682,8 @@
     "@tanstack/virtual-file-routes": ["@tanstack/virtual-file-routes@1.115.0", "", {}, "sha512-XLUh1Py3AftcERrxkxC5Y5m5mfllRH3YR6YVlyjFgI2Tc2Ssy2NKmQFQIafoxfW459UJ8Dn81nWKETEIJifE4g=="],
 
     "@tanstack/zod-form-adapter": ["@tanstack/zod-form-adapter@0.41.2", "", { "dependencies": { "@tanstack/form-core": "0.41.2" }, "peerDependencies": { "zod": "^3.x" } }, "sha512-nurNWvFip0st19md0gQ9UISxAOEsvQo+1EWE4k33wUQdrDsbLbVcduUQbxigktSAV28yZWArZ0hVCrYzGK2poQ=="],
+
+    "@total-typescript/ts-reset": ["@total-typescript/ts-reset@0.6.1", "", {}, "sha512-cka47fVSo6lfQDIATYqb/vO1nvFfbPw7uWLayIXIhGETj0wcOOlrlkobOMDNQOFr9QOafegUPq13V2+6vtD7yg=="],
 
     "@tsconfig/bun": ["@tsconfig/bun@1.0.7", "", {}, "sha512-udGrGJBNQdXGVulehc1aWT73wkR9wdaGBtB6yL70RJsqwW/yJhIg6ZbRlPOfIUiFNrnBuYLBi9CSmMKfDC7dvA=="],
 

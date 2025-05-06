@@ -24,6 +24,6 @@
       "path": "../core"
     }
   ],
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../../reset.d.ts"],
   "exclude": ["scripts/**/*", "tests"]
 }
