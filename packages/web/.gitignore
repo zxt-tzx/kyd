@@ -6,6 +6,7 @@
 # Dist
 dist/
 build/
+dev-dist/
 .vinxi
 .output
 .vercel

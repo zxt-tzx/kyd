@@ -51,7 +51,7 @@ Make a copy of `.dev.vars.example` and name it `.dev.vars`.
 To test on mobile, use Ngrok to create a tunnel to your local frontend:
 
 ```zsh
-ngrok http 3001
+ngrok http https://local.kyd.theintel.io:3000/
 ```
 
 ### Auth and cookies on local development (WIP TBD)

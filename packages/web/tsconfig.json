@@ -25,5 +25,5 @@
       "path": "../functions"
     }
   ],
-  "include": ["./src/**/*", "./sst-env.d.ts", "../../reset.d.ts"]
+  "include": ["./src/**/*", "./sst-env.d.ts", "../../reset.d.ts", "./vite.config.ts" ]
 }
