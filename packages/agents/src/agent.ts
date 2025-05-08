@@ -32,12 +32,26 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
   async onMessage(connection: Connection, message: string) {
     try {
       const data = JSON.parse(message);
-      if (data && data.action === "cancel") {
-        this.cancel();
-        return;
+      
+      // Validate message using our schema
+      const result = AgentMessageBodySchema.safeParse(data);
+      
+      if (result.success) {
+        const messageBody = result.data;
+        
+        if (messageBody.action === "cancel") {
+          this.cancel();
+          return;
+        } else if (messageBody.action === "initialize") {
+          // Handle initialize action if needed for websocket connections
+          // This would be rare since initialization usually happens via HTTP
+          const { githubUsername, prompt } = messageBody;
+          await this.initialize({ githubUsername, prompt });
+          return;
+        }
       }
     } catch {
-      // not JSON or no cancel action; ignore
+      // not JSON or invalid schema format; ignore
     }
   }
 
@@ -408,21 +422,29 @@ export default {
         const body = await request.json();
         const messageBody = AgentMessageBodySchema.parse(body);
 
-        if (messageBody.action === "initialize") {
-          // Get the agent ID from the URL
-          const url = new URL(request.url);
-          const pathParts = url.pathname.split("/");
-          const agentName = pathParts[pathParts.length - 1];
-          if (!agentName) {
-            throw new Response("Missing agent name", { status: 400 });
-          }
-          const { githubUsername, prompt } = messageBody;
+        // Get the agent ID from the URL
+        const url = new URL(request.url);
+        const pathParts = url.pathname.split("/");
+        const agentName = pathParts[pathParts.length - 1];
+        if (!agentName) {
+          throw new Response("Missing agent name", { status: 400 });
+        }
 
-          // Create a stub of the agent to interact with the Durable Object
-          const agent = await getAgentByName(env.DevResearchAgent, agentName);
+        // Create a stub of the agent to interact with the Durable Object
+        const agent = await getAgentByName(env.DevResearchAgent, agentName);
+
+        if (messageBody.action === "initialize") {
+          const { githubUsername, prompt } = messageBody;
           await agent.initialize({ githubUsername, prompt });
 
           return new Response("Agent initialized successfully", {
+            headers: { "Content-Type": "text/plain" },
+            status: 200,
+          });
+        } else if (messageBody.action === "cancel") {
+          await agent.cancel();
+          
+          return new Response("Agent cancelled successfully", {
             headers: { "Content-Type": "text/plain" },
             status: 200,
           });

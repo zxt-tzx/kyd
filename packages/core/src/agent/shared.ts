@@ -27,11 +27,16 @@ export const AgentStateSchema = z.discriminatedUnion("status", [
  * Schema for the agent message body fields
  * Used to validate the POST request body in the research router
  */
-export const AgentMessageBodySchema = z.object({
-  action: z.enum(["initialize"]),
-  prompt: z.string(),
-  githubUsername: z.string(),
-});
+export const AgentMessageBodySchema = z.discriminatedUnion("action", [
+  z.object({
+    action: z.literal("initialize"),
+    prompt: z.string(),
+    githubUsername: z.string(),
+  }),
+  z.object({
+    action: z.literal("cancel"),
+  }),
+]);
 
 export type AgentState = z.infer<typeof AgentStateSchema>;
 export type AgentMessageBody = z.infer<typeof AgentMessageBodySchema>;
