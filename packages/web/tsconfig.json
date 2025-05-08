@@ -15,7 +15,10 @@
       "@/core/*": ["../core/src/*"],
       "@/functions/*": ["../functions/src/*"],
       "@/*": ["./src/*"]
-    }
+    },
+    "types": [
+      "vite-plugin-pwa/client"
+    ]
   },
   "references": [
     {

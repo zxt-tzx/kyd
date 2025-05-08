@@ -15,9 +15,16 @@ export default defineConfig({
     TanStackRouterVite({}),
     react(),
     VitePWA({
-      registerType: "autoUpdate",
+      strategies: "injectManifest",
+      srcDir: "src/service-worker/",
+      filename: "prompt-sw.ts",
+      registerType: "prompt",
       devOptions: {
         enabled: true,
+      },
+      injectManifest: {
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest}"],
+        globIgnores: ["**/prompt-sw*"],
       },
       manifest: {
         name: "Know Your Dev",
@@ -52,33 +59,12 @@ export default defineConfig({
             purpose: "maskable",
           },
         ],
-        // Note: Instead of using 'permissions' which is not supported in ManifestOptions,
-        // we'll request these permissions in the app code when needed
       },
       includeAssets: [
         "favicon.svg",
         "apple-touch-icon-180x180.png",
         "maskable-icon-512x512.png",
       ],
-      // workbox: {
-      //   globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
-      //   runtimeCaching: [
-      //     {
-      //       urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-      //       handler: "CacheFirst",
-      //       options: {
-      //         cacheName: "google-fonts-cache",
-      //         expiration: {
-      //           maxEntries: 10,
-      //           maxAgeSeconds: 60 * 60 * 24 * 365, // <== 365 days
-      //         },
-      //         cacheableResponse: {
-      //           statuses: [0, 200],
-      //         },
-      //       },
-      //     },
-      //   ],
-      // },
     }),
   ],
   assetsInclude: ["**/*.md"],

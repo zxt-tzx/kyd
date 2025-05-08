@@ -17,6 +17,3 @@ dev-dist/
 .vscode/*
 !.vscode/extensions.json
 .idea
-
-# SST
-sst-env.d.ts
