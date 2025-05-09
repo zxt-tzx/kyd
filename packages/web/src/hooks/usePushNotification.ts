@@ -1,47 +1,18 @@
 import { useEffect, useState } from "react";
 import type { PushSubscription } from "web-push";
 
-import { pushSubscriptionJsonSchema } from "@/core/github/web-push/schema";
 import { urlBase64ToUint8Array } from "@/core/util/crypto";
+import { pushSubscriptionJsonSchema } from "@/core/web-push/schema";
+import {
+  getVapidPublicKey,
+  sendNotification,
+  subscribeUser,
+  unsubscribeUser,
+} from "@/lib/api/push-notification";
 
 const sstStage = import.meta.env.VITE_SST_STAGE;
 
 const isPermanentStage = sstStage === "stg" || sstStage === "prod";
-
-async function subscribeUser(subscription: PushSubscription) {
-  // TODO: replace with endpoint
-  // Send the subscription object to your server
-  const response = await fetch("/api/notifications/subscribe", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(subscription),
-  });
-  return response.json();
-}
-
-async function unsubscribeUser() {
-  // TODO: replace with endpoint
-  // Notify your server to remove the subscription
-  const response = await fetch("/api/notifications/unsubscribe", {
-    method: "POST",
-  });
-  return response.json();
-}
-
-async function sendNotification(message: string) {
-  // TODO: replace with endpoint
-  // Request your server to send a test notification
-  const response = await fetch("/api/notifications/send", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ message }),
-  });
-  return response.json();
-}
 
 /**
  * React hook for managing push notifications
@@ -106,13 +77,13 @@ export function usePushNotification() {
     try {
       setError(null);
       const registration = await navigator.serviceWorker.ready;
+      const {
+        data: { vapidPublicKey },
+      } = await getVapidPublicKey();
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         // Using the same application server key as in prompt-sw.ts
-        // TODO: This should be fetched from backend in production
-        applicationServerKey: urlBase64ToUint8Array(
-          "BJgPjZXgb_BKA9zO82LnSHfScw4HZgPfRNmcaoQ_XzK89QSOrawx0uxXHJrZfkm1QpaLhd2RNsNvwMBJA_g7e_k",
-        ),
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
 
       if (!sub) {
@@ -147,12 +118,17 @@ export function usePushNotification() {
     }
   }
 
-  async function sendTestNotification(customMessage?: string) {
+  async function sendTestNotification({
+    title,
+    message,
+  }: {
+    title: string;
+    message: string;
+  }) {
     try {
       setError(null);
       if (subscription) {
-        const messageToSend = customMessage || message;
-        await sendNotification(messageToSend);
+        await sendNotification({ subscription, title, message });
         setMessage("");
         return true;
       }

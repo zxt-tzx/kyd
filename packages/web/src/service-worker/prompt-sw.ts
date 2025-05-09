@@ -33,11 +33,10 @@ self.addEventListener("message", (event) => {
 self.addEventListener("push", function (event) {
   if (event.data) {
     const data = event.data.json();
-    const options = {
+    const options: NotificationOptions = {
       body: data.body,
       icon: data.icon || "/icon.png",
       badge: "/badge.png",
-      vibrate: [100, 50, 100],
       data: {
         dateOfArrival: Date.now(),
         primaryKey: "2",
@@ -50,5 +49,5 @@ self.addEventListener("push", function (event) {
 self.addEventListener("notificationclick", function (event) {
   console.log("Notification click received.");
   event.notification.close();
-  event.waitUntil(self.clients.openWindow("<https://your-website.com>"));
+  event.waitUntil(self.clients.openWindow("https://kyd.theintel.io"));
 });
