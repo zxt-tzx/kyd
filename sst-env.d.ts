@@ -26,6 +26,14 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "VAPID_PRIVATE_KEY": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "VAPID_PUBLIC_KEY": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "Web": {
       "type": "sst.aws.StaticSite"
       "url": string

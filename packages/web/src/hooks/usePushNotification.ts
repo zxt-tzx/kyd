@@ -4,8 +4,6 @@ import type { PushSubscription } from "web-push";
 import { pushSubscriptionJsonSchema } from "@/core/github/web-push/schema";
 import { urlBase64ToUint8Array } from "@/core/util/crypto";
 
-const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-
 async function subscribeUser(subscription: PushSubscription) {
   // TODO: replace with endpoint
   // Send the subscription object to your server
@@ -64,7 +62,7 @@ export function usePushNotification() {
 
   async function getSubscription() {
     // Use the existing service worker
-    const registration = await navigator.serviceWorker.register("/sw.js", {
+    const registration = await navigator.serviceWorker.register("sw.js", {
       scope: "/",
       updateViaCache: "none",
     });
@@ -97,7 +95,9 @@ export function usePushNotification() {
         userVisibleOnly: true,
         // Using the same application server key as in prompt-sw.ts
         // TODO: This should be fetched from backend in production
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+        applicationServerKey: urlBase64ToUint8Array(
+          "BJgPjZXgb_BKA9zO82LnSHfScw4HZgPfRNmcaoQ_XzK89QSOrawx0uxXHJrZfkm1QpaLhd2RNsNvwMBJA_g7e_k",
+        ),
       });
 
       if (!sub) {
