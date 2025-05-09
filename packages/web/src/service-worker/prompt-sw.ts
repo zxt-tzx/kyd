@@ -50,28 +50,3 @@ self.addEventListener("push", function (event) {
       }),
   );
 });
-
-// TODO: use actual public key. probably should fetch from backend instead of hardcode
-async function subscribeUser() {
-  const applicationServerPublicKey =
-    "BH30tDD_Q9brxNYBqGalmU4xLdPgLSjp--PIQH6xjaaeALV7XQGIXJOaJZTY40xuKURefiRLJiPrt1DhrpYIcDQ";
-  const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
-  return await self.registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: applicationServerKey,
-  });
-}
-
-// TODO: abstract to common function
-function urlB64ToUint8Array(base64String: string) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-
-  const rawData = atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}

@@ -54,6 +54,11 @@ To test on mobile, use Ngrok to create a tunnel to your local frontend:
 ngrok http https://local.kyd.theintel.io:3000/
 ```
 
+### Push notifications and PWA
+
+- See `packages/web/vite.config.ts` for the Vite setup.
+- Generate VAPID keys using  `npx web-push generate-vapid-keys`
+
 ### Auth and cookies on local development (WIP TBD)
 
 For auth to work on local development, there is a bit of rigmarole because we are running the frontend locally but the API server is on a `.kyd.theintel.io` domain. So in order to set cookies, you need to:
