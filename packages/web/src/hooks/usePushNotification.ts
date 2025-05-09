@@ -4,6 +4,10 @@ import type { PushSubscription } from "web-push";
 import { pushSubscriptionJsonSchema } from "@/core/github/web-push/schema";
 import { urlBase64ToUint8Array } from "@/core/util/crypto";
 
+const sstStage = import.meta.env.VITE_SST_STAGE;
+
+const isPermanentStage = sstStage === "stg" || sstStage === "prod";
+
 async function subscribeUser(subscription: PushSubscription) {
   // TODO: replace with endpoint
   // Send the subscription object to your server
@@ -62,10 +66,16 @@ export function usePushNotification() {
 
   async function getSubscription() {
     // Use the existing service worker
-    const registration = await navigator.serviceWorker.register("sw.js", {
-      scope: "/",
-      updateViaCache: "none",
-    });
+    const serviceWorkerPath = isPermanentStage
+      ? "prompt-sw.ts"
+      : "dev-sw.js?dev-sw";
+    const registration = await navigator.serviceWorker.register(
+      serviceWorkerPath,
+      {
+        scope: "/",
+        updateViaCache: "none",
+      },
+    );
     const sub = await registration.pushManager.getSubscription();
     return sub;
   }
