@@ -6,6 +6,7 @@
 # Dist
 dist/
 build/
+dev-dist/
 .vinxi
 .output
 .vercel
@@ -16,6 +17,3 @@ build/
 .vscode/*
 !.vscode/extensions.json
 .idea
-
-# SST
-sst-env.d.ts

@@ -16,6 +16,8 @@ export const secret = {
   // OR pay extra to use the IPv4 address
   // alternatively, move to AWS RDS / RDS Aurora
   databaseUrl: new sst.Secret("DATABASE_URL"),
+  vapidPrivateKey: new sst.Secret("VAPID_PRIVATE_KEY"),
+  vapidPublicKey: new sst.Secret("VAPID_PUBLIC_KEY"),
   keys,
 };
 

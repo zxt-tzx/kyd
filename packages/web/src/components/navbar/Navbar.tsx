@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { InfoIcon, UserSearchIcon } from "lucide-react";
+import { BeakerIcon, InfoIcon, UserSearchIcon } from "lucide-react";
 
 import { DarkModeToggle } from "@/components/navbar/DarkModeToggle";
 
@@ -11,14 +11,10 @@ export function Navbar() {
     </div>
   );
   const lightModeLogo = (
-    <h1 className="flex items-center text-2xl dark:hidden">
-      {standardLogo}
-    </h1>
+    <h1 className="flex items-center text-2xl dark:hidden">{standardLogo}</h1>
   );
   const darkModeLogo = (
-    <h1 className="hidden items-center text-2xl dark:flex">
-      {standardLogo}
-    </h1>
+    <h1 className="hidden items-center text-2xl dark:flex">{standardLogo}</h1>
   );
   return (
     <div className="flex h-16 w-full items-center justify-between px-4">
@@ -29,12 +25,19 @@ export function Navbar() {
         </Link>
       </div>
       <nav className="flex items-center gap-4">
-        <Link 
-          to="/about" 
-          className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+        <Link
+          to="/about"
+          className="flex items-center gap-1 text-muted-foreground transition-colors hover:text-primary"
         >
           <InfoIcon className="size-4" />
           <span>About</span>
+        </Link>
+        <Link
+          to="/test"
+          className="flex items-center gap-1 text-muted-foreground transition-colors hover:text-primary"
+        >
+          <BeakerIcon className="size-4" />
+          <span>Test</span>
         </Link>
         <DarkModeToggle />
       </nav>
