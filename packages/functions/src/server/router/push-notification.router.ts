@@ -6,7 +6,9 @@ import webpush from "web-push";
 import {
   newSubscriptionSchema,
   sendNotificationSchema,
+  type PushNotificationPayload,
 } from "@/core/web-push/schema";
+import { sendPushNotification } from "@/core/web-push/util";
 import type { Context } from "@/server/app";
 
 import { createSuccessResponse } from "../response";
@@ -53,14 +55,17 @@ export const pushNotificationRouter = new Hono<Context>()
     zValidator("json", sendNotificationSchema),
     async (c) => {
       const { message, title, subscription } = c.req.valid("json");
-      const sendResult = await webpush.sendNotification(
-        subscription,
-        JSON.stringify({ title, message }),
-        {
-          TTL: 60,
+      const payload: PushNotificationPayload = {
+        title,
+        options: {
+          body: message,
         },
-      );
-      console.dir(sendResult);
+      };
+
+      // Using the type-safe wrapper function instead of direct webpush call
+      const sendResult = await sendPushNotification(subscription, payload, {
+        TTL: 60,
+      });
       return c.json(
         createSuccessResponse({
           data: { sendResult },

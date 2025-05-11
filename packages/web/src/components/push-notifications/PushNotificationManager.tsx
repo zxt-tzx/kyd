@@ -6,7 +6,6 @@ export function PushNotificationManager() {
     subscription,
     message,
     setMessage,
-    error,
     subscribeToPush,
     unsubscribeFromPush,
     sendTestNotification,
@@ -19,12 +18,6 @@ export function PushNotificationManager() {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Push Notifications</h3>
-
-      {error && (
-        <div className="rounded bg-red-100 p-2 text-red-700">
-          Error: {error.message}
-        </div>
-      )}
 
       {subscription ? (
         <div className="space-y-4">

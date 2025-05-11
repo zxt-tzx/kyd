@@ -7,6 +7,8 @@ import {
 import { NavigationRoute, registerRoute } from "workbox-routing";
 
 import { isDevStage } from "@/core/util/stage";
+import type { FullNotificationOptions } from "@/core/web-push/schema";
+import { pushNotificationPayloadSchema } from "@/core/web-push/schema";
 
 /* DEV NOTES FOR FUTURE ME */
 /* To see console log for service workers
@@ -45,23 +47,68 @@ self.addEventListener("message", (event) => {
 // Register event listener for the 'push' event.
 self.addEventListener("push", function (event) {
   if (event.data) {
-    const data = event.data.json();
-    // TODO: schema to parse this, since any is unsafe
-    const options: NotificationOptions = {
-      body: data.message,
-      icon: data.icon || "/icon.png",
-      badge: "/badge.png",
-      data: {
-        dateOfArrival: Date.now(),
-        primaryKey: "2",
+    // Parse data using the schema for validation
+    const res = pushNotificationPayloadSchema.safeParse(event.data.json());
+
+    if (!res.success) {
+      console.error("Failed to parse push notification data:", res.error);
+      return;
+    }
+    const {
+      options: {
+        body,
+        // actions,
+        badge,
+        // data,
+        // dir,
+        icon,
+        // image,
+        // lang,
+        // renotify,
+        // requireInteraction,
+        // silent,
+        // tag,
+        // timestamp,
+        vibrate,
       },
+      title,
+    } = res.data;
+
+    // Create browser notification options
+    // NOTE: Our schema has 'message' but browser expects 'body'
+    const options: FullNotificationOptions = {
+      body,
+      icon: icon ?? "/icon.png",
+      badge: badge ?? "/badge.png",
+      vibrate: vibrate ?? [100, 50, 100],
+      // Optional settings - uncomment as needed
+      // tag: 'kyd-research', // Group related notifications
+      // renotify: true, // Alert user even if there's an existing notification with same tag
+      // requireInteraction: true, // Don't auto-close the notification
+      // silent: false, // Allow sounds/vibrations
+      // image: "/notification-image.png", // Large image to display
+      /* Other available options:
+      actions: [{ action: 'view', title: 'View', icon: '/action-icon.png' }],
+      dir: 'auto', // or 'ltr', 'rtl'
+      lang: 'en',
+      timestamp: Date.now(), // Time associated with the notification
+      */
     };
-    event.waitUntil(self.registration.showNotification(data.title, options));
+
+    // Title is passed as first parameter to showNotification
+    event.waitUntil(self.registration.showNotification(title, options));
   }
 });
 
 self.addEventListener("notificationclick", function (event) {
   console.log("Notification click received.");
   event.notification.close();
-  event.waitUntil(self.clients.openWindow("https://kyd.theintel.io"));
+
+  // Retrieve data from the notification
+  const notificationData = event.notification.data;
+
+  // Use the URL from notification data or fallback to default
+  const urlToOpen = notificationData?.url || "https://kyd.theintel.io";
+
+  event.waitUntil(self.clients.openWindow(urlToOpen));
 });
