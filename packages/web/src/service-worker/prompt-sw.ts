@@ -6,6 +6,8 @@ import {
 } from "workbox-precaching";
 import { NavigationRoute, registerRoute } from "workbox-routing";
 
+import { isDevStage } from "@/core/util/stage";
+
 /* DEV NOTES FOR FUTURE ME */
 /* To see console log for service workers
   1. go to chrome://inspect/#service-workers
@@ -16,7 +18,7 @@ declare let self: ServiceWorkerGlobalScope;
 
 const sstStage = import.meta.env.VITE_SST_STAGE;
 
-const isDev = sstStage !== "stg" && sstStage !== "prod";
+const isDev = isDevStage(sstStage);
 
 // somehow calling workbox methods on dev results in error
 if (!isDev) {
@@ -30,7 +32,8 @@ if (!isDev) {
   registerRoute(new NavigationRoute(createHandlerBoundToURL("index.html")));
 }
 
-if (!isDev) {
+// in dev, don't wait and always use the latest worker
+if (isDev) {
   self.skipWaiting();
 }
 
@@ -55,3 +58,10 @@ self.addEventListener("push", function (event) {
     };
     event.waitUntil(self.registration.showNotification(data.title, options));
   }
+});
+
+self.addEventListener("notificationclick", function (event) {
+  console.log("Notification click received.");
+  event.notification.close();
+  event.waitUntil(self.clients.openWindow("https://kyd.theintel.io"));
+});
