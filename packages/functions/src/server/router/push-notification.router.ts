@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import { Resource } from "sst";
 import webpush from "web-push";
 
+import { getUrl } from "@/core/util/stage";
 import {
   NewSubscriptionSchema,
   SendNotificationSchema,
@@ -55,10 +56,14 @@ export const pushNotificationRouter = new Hono<Context>()
     zValidator("json", SendNotificationSchema),
     async (c) => {
       const { message, title, subscription } = c.req.valid("json");
+      const urlToOpen = getUrl(process.env.SST_STAGE!);
       const payload: PushNotificationPayload = {
         title,
         options: {
           body: message,
+          data: {
+            urlToOpen,
+          },
         },
       };
 

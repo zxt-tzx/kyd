@@ -48,7 +48,10 @@ export type NotificationAction = z.infer<typeof NotificationActionSchema>;
 
 // custom notification data schema
 export const NotificationDataSchema = z
-  .object({})
+  .object({
+    urlToOpen: z.string().url(),
+  })
+  .optional()
   .describe("Arbitrary data associated with the notification");
 
 export type NotificationData = z.infer<typeof NotificationDataSchema>;
@@ -73,14 +76,12 @@ export const NotificationOptionsSchema = z.object({
     .string()
     .optional()
     .describe("Body text of the notification, displayed below the title"),
-  data: NotificationDataSchema
-    .optional()
-    .describe("Arbitrary data to associate with the notification"),
-  dir: DirectionEnum
-    .optional()
-    .describe(
-      "Direction in which to display the notification: auto, ltr, or rtl",
-    ),
+  data: NotificationDataSchema.optional().describe(
+    "Arbitrary data to associate with the notification",
+  ),
+  dir: DirectionEnum.optional().describe(
+    "Direction in which to display the notification: auto, ltr, or rtl",
+  ),
   icon: z
     .string()
     .optional()

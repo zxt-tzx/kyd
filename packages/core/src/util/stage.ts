@@ -7,3 +7,14 @@ export function isDeployedStage(currStage: string) {
 export function isDevStage(currStage: string) {
   return !isDeployedStage(currStage);
 }
+
+export function getUrl(stage: string) {
+  switch (stage) {
+    case "stg":
+      return "https://stg.kyd.theintel.io";
+    case "prod":
+      return "https://kyd.theintel.io";
+    default:
+      return "https://local.theintel.io";
+  }
+}

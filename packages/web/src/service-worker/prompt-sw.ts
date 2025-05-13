@@ -8,7 +8,10 @@ import { NavigationRoute, registerRoute } from "workbox-routing";
 
 import { isDevStage } from "@/core/util/stage";
 import type { FullNotificationOptions } from "@/core/web-push/schema";
-import { PushNotificationPayloadSchema } from "@/core/web-push/schema";
+import {
+  NotificationDataSchema,
+  PushNotificationPayloadSchema,
+} from "@/core/web-push/schema";
 
 /* DEV NOTES FOR FUTURE ME */
 /* To see console log for service workers
@@ -55,7 +58,7 @@ self.addEventListener("push", function (event) {
       return;
     }
     const {
-      options: { body, badge, icon },
+      options: { body, badge, icon, data },
       title,
     } = res.data;
 
@@ -65,6 +68,7 @@ self.addEventListener("push", function (event) {
       body,
       icon: icon ?? "/icon.png",
       badge: badge ?? "/badge.png",
+      data,
       // Optional settings - uncomment as needed
       // tag: 'kyd-research', // Group related notifications
       // renotify: true, // Alert user even if there's an existing notification with same tag
@@ -88,10 +92,12 @@ self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
   // Retrieve data from the notification
-  const notificationData = event.notification.data;
+  const notificationData = NotificationDataSchema.parse(
+    event.notification.data,
+  );
 
   // Use the URL from notification data or fallback to default
-  const urlToOpen = notificationData?.url || "https://kyd.theintel.io";
+  const url = notificationData?.urlToOpen || "https://kyd.theintel.io";
 
-  event.waitUntil(self.clients.openWindow(urlToOpen));
+  event.waitUntil(self.clients.openWindow(url));
 });
