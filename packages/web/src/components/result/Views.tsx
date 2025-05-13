@@ -49,8 +49,8 @@ export function ResearchResultSkeleton({
         </div>
 
         {/* Status line and Stop button Skeleton */}
-        <div className="mx-auto mb-8 max-w-3xl flex items-center justify-between">
-          <div className="inline-flex items-center w-64">
+        <div className="mx-auto mb-8 flex max-w-3xl items-center justify-between">
+          <div className="inline-flex w-64 items-center">
             <Skeleton className="mr-2 h-5 w-28" />
             <div
               className={`mx-2 size-3 rounded-full ${
@@ -63,9 +63,9 @@ export function ResearchResultSkeleton({
             />
           </div>
           <div className="w-64 text-center">
-            <Skeleton className="h-6 w-32 mx-auto" />
+            <Skeleton className="mx-auto h-6 w-32" />
           </div>
-          <div className="w-64 flex justify-end">
+          <div className="flex w-64 justify-end">
             <Skeleton className="h-10 w-32" />
           </div>
         </div>

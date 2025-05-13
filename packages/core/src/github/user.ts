@@ -1,4 +1,4 @@
-import { githubUserSchema, type GitHubUser } from "./schema.rest";
+import { GithubUserSchema, type GitHubUser } from "./schema.rest";
 
 /**
  * Fetches a GitHub user by username and validates the response
@@ -18,7 +18,7 @@ export async function fetchUser(username: string): Promise<GitHubUser> {
     );
   }
   const data = await response.json();
-  return githubUserSchema.parse(data);
+  return GithubUserSchema.parse(data);
 }
 
 export function isUser(user: GitHubUser) {

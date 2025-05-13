@@ -6,6 +6,9 @@ const apiFn = new sst.aws.Function("ApiFn", {
   handler: "./packages/functions/src/api.handler",
   link: [...allSecrets],
   runtime: "nodejs22.x",
+  environment: {
+    SST_STAGE: $app.stage,
+  },
 });
 
 export const api = new sst.aws.Router("Api", {

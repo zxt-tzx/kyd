@@ -2,7 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 
 import {
-  promptSchema,
+  PromptSchema,
   validateAndExtractGithubUsername,
 } from "@/core/github/schema.validation";
 import { fetchUser, IS_USER_MESSAGE, isUser } from "@/core/github/user";
@@ -82,7 +82,7 @@ export function DevSearchInput() {
 
   const handlePromptSelect = (prompt: string) => {
     // Validate with promptSchema first
-    const result = promptSchema.safeParse(prompt);
+    const result = PromptSchema.safeParse(prompt);
     if (result.success) {
       // Update the input field directly through the form field
       form.setFieldValue("promptInput", prompt);
@@ -183,7 +183,7 @@ export function DevSearchInput() {
               validators={{
                 onChange: ({ value }) => {
                   if (!value) return undefined;
-                  const result = promptSchema.safeParse(value);
+                  const result = PromptSchema.safeParse(value);
                   if (!result.success) {
                     return result.error.message;
                   }

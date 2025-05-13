@@ -3,7 +3,7 @@ import {
   env,
   waitOnExecutionContext,
 } from "cloudflare:test";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock node-html-parser and css-select explicitly
 vi.mock("node-html-parser");
@@ -13,20 +13,20 @@ vi.mock("css-select");
 vi.mock("agents", () => ({
   getAgentByName: vi.fn(),
   routeAgentRequest: vi.fn().mockResolvedValue(null),
-  Connection: vi.fn()
+  Connection: vi.fn(),
 }));
 
 vi.mock("agents/ai-chat-agent", () => ({
   AIChatAgent: class AIChatAgent {
     constructor() {}
-  }
+  },
 }));
 
 // Create a simplified mock of the worker
 const mockWorker = {
   fetch: async (request: Request, env: any, ctx: ExecutionContext) => {
     return new Response("Not found", { status: 404 });
-  }
+  },
 };
 
 // Mock Env interface
@@ -42,10 +42,10 @@ describe("Chat worker", () => {
   it("responds with Not found", async () => {
     const request = new Request("http://example.com");
     const ctx = createExecutionContext();
-    
+
     // Use the mock worker instead of the real one
     const response = await mockWorker.fetch(request, env, ctx);
-    
+
     await waitOnExecutionContext(ctx);
     expect(await response.text()).toBe("Not found");
     expect(response.status).toBe(404);

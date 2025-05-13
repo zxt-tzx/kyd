@@ -4,5 +4,5 @@ export const selectOne = () => null;
 
 export default {
   selectAll,
-  selectOne
+  selectOne,
 };

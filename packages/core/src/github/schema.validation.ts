@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const repoUserInputSchema = z.object({
+export const RepoUserInputSchema = z.object({
   owner: z
     .string()
     .min(1)
@@ -53,7 +53,7 @@ export const validateAndExtractGithubOwnerAndRepo = (
   }
   const [owner, repo] = parts;
   // Validate against schema
-  const result = repoUserInputSchema.safeParse({ owner, repo });
+  const result = RepoUserInputSchema.safeParse({ owner, repo });
   if (!result.success) {
     if (ctx) {
       result.error.errors.forEach((err) => ctx.addIssue(err));
@@ -67,7 +67,7 @@ export const validateAndExtractGithubOwnerAndRepo = (
 const INVALID_USERNAME_MESSAGE = "Please enter a valid GitHub username";
 
 // Schema for GitHub username validation
-export const githubUsernameSchema = z
+export const GithubUsernameSchema = z
   .string()
   .min(1)
   .max(39)
@@ -102,7 +102,7 @@ export function validateAndExtractGithubUsername(
   }
   const [username] = parts;
   // Validate against schema
-  const result = githubUsernameSchema.safeParse(username);
+  const result = GithubUsernameSchema.safeParse(username);
   if (!result.success) {
     if (ctx) {
       result.error.errors.forEach((err) => ctx.addIssue(err));
@@ -114,30 +114,30 @@ export function validateAndExtractGithubUsername(
 }
 
 // Schema for custom prompt input
-export const promptSchema = z
+export const PromptSchema = z
   .string()
   .max(200, "Prompt is too long, please keep it under 200 characters")
   .optional();
 
 // Single shared schema for both frontend and backend
-export const researchInputSchema = z.object({
+export const ResearchInputSchema = z.object({
   username: z.string().transform((input, ctx) => {
     const username = validateAndExtractGithubUsername(input, ctx);
     if (!username) return z.NEVER;
     return username;
   }),
-  prompt: promptSchema,
+  prompt: PromptSchema,
 });
 
 // For frontend form submission - uses the same schema with renamed fields
-export const devSearchSubmitSchema = z
+export const DevSearchSubmitSchema = z
   .object({
     githubInput: z.string(),
     promptInput: z.string().optional(),
   })
   .transform((data, ctx) => {
     // Validate using the same schema logic
-    const result = researchInputSchema.safeParse({
+    const result = ResearchInputSchema.safeParse({
       username: data.githubInput,
       prompt: data.promptInput,
     });

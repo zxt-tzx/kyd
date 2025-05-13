@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-import tailwindCssAnimate from "tailwindcss-animate";
 import typography from "@tailwindcss/typography";
+import tailwindCssAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -97,7 +97,7 @@ export default {
       typography: {
         DEFAULT: {
           css: {
-            maxWidth: 'none',
+            maxWidth: "none",
           },
         },
       },
