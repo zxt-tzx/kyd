@@ -12,10 +12,10 @@ build/
 .netlify
 .wrangler
 
+# service worker
+dev-dist/
+
 # IDE
 .vscode/*
 !.vscode/extensions.json
 .idea
-
-# SST
-sst-env.d.ts

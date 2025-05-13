@@ -11,11 +11,13 @@
     "outDir": "./build",
     "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "WebWorker"],
     "paths": {
       "@/core/*": ["../core/src/*"],
       "@/functions/*": ["../functions/src/*"],
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["vite-plugin-pwa/client"]
   },
   "references": [
     {
@@ -25,5 +27,11 @@
       "path": "../functions"
     }
   ],
-  "include": ["./src/**/*", "./sst-env.d.ts", "../../reset.d.ts"]
+  "include": [
+    "./src/**/*",
+    "./sst-env.d.ts",
+    "../../reset.d.ts",
+    "./vite.config.ts",
+    "./@types/lucide-react.d.ts"
+  ]
 }

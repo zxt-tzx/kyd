@@ -5,7 +5,6 @@
 import { tool } from "ai";
 import { z } from "zod";
 
-
 /**
  * Weather information tool that requires human confirmation
  * When invoked, this will present a confirmation dialog to the user

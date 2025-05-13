@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { Stage } from "@/util/stage";
+
 // Base schema for common fields in active agent states
 const AgentActiveStateBase = z.object({
   githubUsername: z.string(),
@@ -40,11 +42,6 @@ export const AgentMessageBodySchema = z.discriminatedUnion("action", [
 
 export type AgentState = z.infer<typeof AgentStateSchema>;
 export type AgentMessageBody = z.infer<typeof AgentMessageBodySchema>;
-
-/**
- * Environment stage type
- */
-export type Stage = "stg" | "prod" | (string & {});
 
 /**
  * Get agent configuration based on nanoId and stage

@@ -22,8 +22,8 @@ export const devs = pgTable(
   (table) => [index("email_idx").on(table.email)],
 );
 
-export const insertDevSchema = createInsertSchema(devs).omit({
+export const InsertDevSchema = createInsertSchema(devs).omit({
   id: true,
 });
 
-export type InsertDev = z.infer<typeof insertDevSchema>;
+export type InsertDev = z.infer<typeof InsertDevSchema>;

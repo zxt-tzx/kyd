@@ -3,7 +3,7 @@ import { generateText } from "ai";
 import { parse, type HTMLElement } from "node-html-parser";
 import { z } from "zod";
 
-export const pinnedRepoSchema = z.object({
+export const PinnedRepoSchema = z.object({
   author: z.string(),
   name: z.string(),
   description: z.string(),
@@ -13,7 +13,7 @@ export const pinnedRepoSchema = z.object({
   url: z.string().url(),
 });
 
-export type PinnedRepo = z.infer<typeof pinnedRepoSchema>;
+export type PinnedRepo = z.infer<typeof PinnedRepoSchema>;
 
 /**
  * Fetches pinned repositories for a GitHub user

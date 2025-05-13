@@ -13,7 +13,7 @@ import {
 } from "@/core/agent/shared";
 import { eq } from "@/core/db";
 import { researches } from "@/core/db/schema/entities/research.sql";
-import { researchInputSchema } from "@/core/github/schema.validation";
+import { ResearchInputSchema } from "@/core/github/schema.validation";
 import { fetchUser, IS_USER_MESSAGE, isUser } from "@/core/github/user";
 import { createNewResearch } from "@/core/research";
 import { getDeps } from "@/deps";
@@ -46,7 +46,7 @@ export const researchRouter = new Hono<Context>()
       }),
     );
   })
-  .post("/", zValidator("json", researchInputSchema), async (c) => {
+  .post("/", zValidator("json", ResearchInputSchema), async (c) => {
     const { username, prompt: userPrompt } = c.req.valid("json");
     // TODO: replace this with authed fetch, higher rate limit, lower likelihood of something going wrong
     const user = await fetchUser(username);

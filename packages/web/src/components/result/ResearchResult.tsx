@@ -130,21 +130,18 @@ function RunningAgentResult({
   return (
     <>
       <h1 className="mb-8 text-5xl tracking-tight">Researching Dev...</h1>
-      <div className="mx-auto mb-8 max-w-3xl flex items-center justify-between">
-        <div className="inline-flex items-center text-xl text-muted-foreground w-64">
+      <div className="mx-auto mb-8 flex max-w-3xl items-center justify-between">
+        <div className="inline-flex w-64 items-center text-xl text-muted-foreground">
           <span className="text-muted-foreground">Connection: </span>
           <div
             className={`mx-2 size-3 rounded-full ${isLoading ? "bg-amber-500" : isConnected ? "bg-green-500" : "bg-red-500"}`}
           />
         </div>
-        <div className="text-xl text-muted-foreground w-64 text-center">
+        <div className="w-64 text-center text-xl text-muted-foreground">
           Running for: {elapsedTime}s
         </div>
-        <div className="w-64 flex justify-end">
-          <Button
-            variant="destructive"
-            onClick={onStop}
-          >
+        <div className="flex w-64 justify-end">
+          <Button variant="destructive" onClick={onStop}>
             Stop Research
           </Button>
         </div>

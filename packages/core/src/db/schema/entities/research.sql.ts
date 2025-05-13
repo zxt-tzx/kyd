@@ -14,8 +14,8 @@ export const researches = pgTable("researches", {
     .notNull(),
 });
 
-export const insertResearchSchema = createInsertSchema(researches).omit({
+export const InsertResearchSchema = createInsertSchema(researches).omit({
   id: true,
 });
 
-export type InsertResearch = z.infer<typeof insertResearchSchema>;
+export type InsertResearch = z.infer<typeof InsertResearchSchema>;

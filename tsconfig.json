@@ -21,6 +21,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
     // "noPropertyAccessFromIndexSignature": true,
-  },
-  "files": ["reset.d.ts"]
+  }
 }
