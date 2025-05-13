@@ -1,33 +1,33 @@
 import { z } from "zod";
 
 // Schema for the keys in a push subscription
-export const pushSubscriptionKeysSchema = z.object({
+export const PushSubscriptionKeysSchema = z.object({
   p256dh: z.string(),
   auth: z.string(),
 });
 
 // Schema for the push subscription JSON
-export const pushSubscriptionJsonSchema = z.object({
+export const PushSubscriptionJsonSchema = z.object({
   endpoint: z.string(),
   expirationTime: z.number().nullable().optional(),
-  keys: pushSubscriptionKeysSchema,
+  keys: PushSubscriptionKeysSchema,
 });
 
 // Type for the push subscription JSON
-export type PushSubscriptionJson = z.infer<typeof pushSubscriptionJsonSchema>;
+export type PushSubscriptionJson = z.infer<typeof PushSubscriptionJsonSchema>;
 
-export const newSubscriptionSchema = z.object({
-  subscription: pushSubscriptionJsonSchema,
+export const NewSubscriptionSchema = z.object({
+  subscription: PushSubscriptionJsonSchema,
 });
 
-export const sendNotificationSchema = z.object({
-  subscription: pushSubscriptionJsonSchema,
+export const SendNotificationSchema = z.object({
+  subscription: PushSubscriptionJsonSchema,
   title: z.string(),
   message: z.string(),
 });
 
 // Define notification action schema
-export const notificationActionSchema = z.object({
+export const NotificationActionSchema = z.object({
   action: z
     .string()
     .describe(
@@ -44,23 +44,23 @@ export const notificationActionSchema = z.object({
     ),
 });
 
-export type NotificationAction = z.infer<typeof notificationActionSchema>;
+export type NotificationAction = z.infer<typeof NotificationActionSchema>;
 
 // custom notification data schema
-export const notificationDataSchema = z
+export const NotificationDataSchema = z
   .object({})
   .describe("Arbitrary data associated with the notification");
 
-export type NotificationData = z.infer<typeof notificationDataSchema>;
+export type NotificationData = z.infer<typeof NotificationDataSchema>;
 
 // Define direction enum for notifications
-export const directionEnum = z.enum(["auto", "ltr", "rtl"]);
+export const DirectionEnum = z.enum(["auto", "ltr", "rtl"]);
 
 // see https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification#options
-export const notificationOptionsSchema = z.object({
+export const NotificationOptionsSchema = z.object({
   // Optional fields
   actions: z
-    .array(notificationActionSchema)
+    .array(NotificationActionSchema)
     .optional()
     .describe("Array of actions to display in the notification (Experimental)"),
   badge: z
@@ -73,10 +73,10 @@ export const notificationOptionsSchema = z.object({
     .string()
     .optional()
     .describe("Body text of the notification, displayed below the title"),
-  data: notificationDataSchema
+  data: NotificationDataSchema
     .optional()
     .describe("Arbitrary data to associate with the notification"),
-  dir: directionEnum
+  dir: DirectionEnum
     .optional()
     .describe(
       "Direction in which to display the notification: auto, ltr, or rtl",
@@ -129,14 +129,14 @@ export const notificationOptionsSchema = z.object({
     .describe("Vibration pattern for device hardware"),
 });
 
-export type FullNotificationOptions = z.infer<typeof notificationOptionsSchema>;
+export type FullNotificationOptions = z.infer<typeof NotificationOptionsSchema>;
 
 // Base schema for push notification payloads (minimal version)
-export const pushNotificationPayloadSchema = z.object({
+export const PushNotificationPayloadSchema = z.object({
   title: z.string(),
-  options: notificationOptionsSchema,
+  options: NotificationOptionsSchema,
 });
 
 export type PushNotificationPayload = z.infer<
-  typeof pushNotificationPayloadSchema
+  typeof PushNotificationPayloadSchema
 >;

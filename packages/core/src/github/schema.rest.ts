@@ -9,10 +9,10 @@ import { z } from "zod";
 - hooked up GitHub GraphQL schema for type inference
 */
 
-export type Repo = z.infer<typeof repoSchema>;
+export type Repo = z.infer<typeof RepoSchema>;
 
 // shapes from REST API
-export const repoSchema = z
+export const RepoSchema = z
   .object({
     owner: z
       .object({
@@ -33,7 +33,7 @@ export const repoSchema = z
   })
   .strip();
 
-export const authenticatedUserEmailsSchema = z.array(
+export const AuthenticatedUserEmailsSchema = z.array(
   z.object({
     email: z.string(),
     primary: z.boolean(),
@@ -41,9 +41,9 @@ export const authenticatedUserEmailsSchema = z.array(
   }),
 );
 
-export type GitHubUser = z.infer<typeof githubUserSchema>;
+export type GitHubUser = z.infer<typeof GithubUserSchema>;
 
-export const githubUserSchema = z
+export const GithubUserSchema = z
   .object({
     login: z.string(),
     id: z.number(),

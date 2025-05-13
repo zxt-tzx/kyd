@@ -4,8 +4,8 @@ import { Resource } from "sst";
 import webpush from "web-push";
 
 import {
-  newSubscriptionSchema,
-  sendNotificationSchema,
+  NewSubscriptionSchema,
+  SendNotificationSchema,
   type PushNotificationPayload,
 } from "@/core/web-push/schema";
 import { sendPushNotification } from "@/core/web-push/util";
@@ -30,7 +30,7 @@ export const pushNotificationRouter = new Hono<Context>()
       }),
     );
   })
-  .post("/subscribe", zValidator("json", newSubscriptionSchema), async (c) => {
+  .post("/subscribe", zValidator("json", NewSubscriptionSchema), async (c) => {
     const { subscription } = c.req.valid("json");
     // In a production environment, you would want to store the subscription in a database
     return c.json(
@@ -52,7 +52,7 @@ export const pushNotificationRouter = new Hono<Context>()
   })
   .post(
     "/send-notification",
-    zValidator("json", sendNotificationSchema),
+    zValidator("json", SendNotificationSchema),
     async (c) => {
       const { message, title, subscription } = c.req.valid("json");
       const payload: PushNotificationPayload = {

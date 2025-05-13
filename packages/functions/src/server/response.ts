@@ -23,16 +23,16 @@ export function isErrorResponse(response: unknown): response is ErrorResponse {
 }
 
 // export const sortBySchema = z.enum(["updated", "created"]);
-export const orderSchema = z.enum(["asc", "desc"]);
+export const OrderSchema = z.enum(["asc", "desc"]);
 
 // export type SortBy = z.infer<typeof sortBySchema>;
-export type Order = z.infer<typeof orderSchema>;
+export type Order = z.infer<typeof OrderSchema>;
 
-export const paginationSchema = z.object({
+export const PaginationSchema = z.object({
   page: z.string().pipe(z.coerce.number().int().positive()).optional(),
   limit: z.string().pipe(z.coerce.number().int().positive()).optional(),
   // .default("10"),
-  order: orderSchema.optional(), //.default("desc"),
+  order: OrderSchema.optional(), //.default("desc"),
   // sortBy: sortBySchema.optional().default("created"),
   // author: z.optional(z.string()),
 });

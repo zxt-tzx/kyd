@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { urlBase64ToUint8Array } from "@/core/util/crypto";
 import { isDeployedStage } from "@/core/util/stage";
-import { pushSubscriptionJsonSchema } from "@/core/web-push/schema";
+import { PushSubscriptionJsonSchema } from "@/core/web-push/schema";
 import {
   getVapidPublicKey,
   sendNotification,
@@ -69,7 +69,7 @@ export function usePushNotification() {
 
     setSubscription(sub);
     // Use parsePushSubscription to validate and parse the subscription JSON
-    const subJson = pushSubscriptionJsonSchema.parse(sub.toJSON());
+    const subJson = PushSubscriptionJsonSchema.parse(sub.toJSON());
     // Send the subscription to the server
     await subscribeUser(subJson);
     return true;
@@ -89,7 +89,7 @@ export function usePushNotification() {
     message: string;
   }) {
     if (subscription) {
-      const subJson = pushSubscriptionJsonSchema.parse(subscription.toJSON());
+      const subJson = PushSubscriptionJsonSchema.parse(subscription.toJSON());
       await sendNotification({ subscription: subJson, title, message });
       setMessage("");
       return true;

@@ -8,7 +8,7 @@ import { NavigationRoute, registerRoute } from "workbox-routing";
 
 import { isDevStage } from "@/core/util/stage";
 import type { FullNotificationOptions } from "@/core/web-push/schema";
-import { pushNotificationPayloadSchema } from "@/core/web-push/schema";
+import { PushNotificationPayloadSchema } from "@/core/web-push/schema";
 
 /* DEV NOTES FOR FUTURE ME */
 /* To see console log for service workers
@@ -48,7 +48,7 @@ self.addEventListener("message", (event) => {
 self.addEventListener("push", function (event) {
   if (event.data) {
     // Parse data using the schema for validation
-    const res = pushNotificationPayloadSchema.safeParse(event.data.json());
+    const res = PushNotificationPayloadSchema.safeParse(event.data.json());
 
     if (!res.success) {
       console.error("Failed to parse push notification data:", res.error);
