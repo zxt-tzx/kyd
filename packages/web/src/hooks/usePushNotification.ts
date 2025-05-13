@@ -44,9 +44,7 @@ export function usePushNotification() {
 
   async function registerServiceWorker() {
     // Use the existing service worker
-    const serviceWorkerPath = isDeployed
-      ? "/prompt-sw.ts"
-      : "/dev-sw.js?dev-sw";
+    const serviceWorkerPath = isDeployed ? "/sw.js" : "/dev-sw.js?dev-sw";
     try {
       const registration = await navigator.serviceWorker.register(
         serviceWorkerPath,
@@ -78,7 +76,7 @@ export function usePushNotification() {
       } = await getVapidPublicKey();
       const sub = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        // Using the same application server key as in prompt-sw.ts
+        // Using the same application server key as in sw.ts
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
 
