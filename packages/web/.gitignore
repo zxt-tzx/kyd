@@ -6,12 +6,14 @@
 # Dist
 dist/
 build/
-dev-dist/
 .vinxi
 .output
 .vercel
 .netlify
 .wrangler
+
+# service worker
+dev-dist/
 
 # IDE
 .vscode/*

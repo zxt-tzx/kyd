@@ -17,9 +17,7 @@
       "@/functions/*": ["../functions/src/*"],
       "@/*": ["./src/*"]
     },
-    "types": [
-      "vite-plugin-pwa/client"
-    ]
+    "types": ["vite-plugin-pwa/client"]
   },
   "references": [
     {
@@ -29,5 +27,11 @@
       "path": "../functions"
     }
   ],
-  "include": ["./src/**/*", "./sst-env.d.ts", "../../reset.d.ts", "./vite.config.ts", "./@types/lucide-react.d.ts" ]
+  "include": [
+    "./src/**/*",
+    "./sst-env.d.ts",
+    "../../reset.d.ts",
+    "./vite.config.ts",
+    "./@types/lucide-react.d.ts"
+  ]
 }

@@ -10,7 +10,6 @@ const prefixes = {
   users: "usr",
   devs: "dev",
   researches: "rsc",
-  push_notification_subscriptions: "psn",
 } as const;
 
 function createId(prefix: keyof typeof prefixes): string {

@@ -141,10 +141,7 @@ function RunningAgentResult({
           Running for: {elapsedTime}s
         </div>
         <div className="flex w-64 justify-end">
-          <Button
-            variant="destructive"
-            onClick={onStop}
-          >
+          <Button variant="destructive" onClick={onStop}>
             Stop Research
           </Button>
         </div>

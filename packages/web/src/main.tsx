@@ -5,9 +5,8 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { ThemeProvider } from "next-themes";
 import ReactDOM from "react-dom/client";
 
-import { Spinner } from "@/components/ui/spinner";
-
 import { queryClient } from "@/lib/queryClient";
+import { Spinner } from "@/components/ui/spinner";
 
 import { Error } from "./components/Error";
 import { NotFound } from "./components/NotFound";

@@ -57,7 +57,7 @@ ngrok http https://local.kyd.theintel.io:3000/
 ### Push notifications and PWA
 
 - See `packages/web/vite.config.ts` for the Vite setup.
-- Generate VAPID keys using  `npx web-push generate-vapid-keys`
+- Generate VAPID keys using `npx web-push generate-vapid-keys`
 
 ### Auth and cookies on local development (WIP TBD)
 

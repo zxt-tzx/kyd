@@ -1,4 +1,5 @@
 import { Loader2Icon, LoaderIcon } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 
 type SpinnerProps = {
@@ -11,27 +12,30 @@ type SpinnerProps = {
  * Default spinner using Loader2Icon from lucide-react.
  * Used for button loading states and inline loading indicators.
  */
-export function Spinner({ 
-  size = "md", 
+export function Spinner({
+  size = "md",
   className,
-  variant = "default"
+  variant = "default",
 }: SpinnerProps) {
   const sizeClasses = {
     xs: "size-3",
     sm: "size-4",
     md: "size-6",
-    lg: "size-8"
+    lg: "size-8",
   };
-  
+
   if (variant === "circle") {
     return (
-      <div className={cn("animate-spin rounded-full border-2 border-current border-t-transparent", 
-        sizeClasses[size], 
-        className)}
+      <div
+        className={cn(
+          "animate-spin rounded-full border-2 border-current border-t-transparent",
+          sizeClasses[size],
+          className,
+        )}
       />
     );
   }
-  
+
   return (
     <Loader2Icon className={cn("animate-spin", sizeClasses[size], className)} />
   );
@@ -41,17 +45,17 @@ export function Spinner({
  * Circular spinner with an outlined circle design.
  * Used for full-page or container loading states.
  */
-export function CircleSpinner({ 
-  size = "md", 
-  className 
+export function CircleSpinner({
+  size = "md",
+  className,
 }: Omit<SpinnerProps, "variant">) {
   const sizeClasses = {
     xs: "size-3",
     sm: "size-4",
     md: "size-6",
-    lg: "size-8"
+    lg: "size-8",
   };
-  
+
   return (
     <LoaderIcon className={cn("animate-spin", sizeClasses[size], className)} />
   );

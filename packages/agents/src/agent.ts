@@ -32,13 +32,13 @@ export class DevResearchAgent extends AIChatAgent<Env, AgentState> {
   async onMessage(connection: Connection, message: string) {
     try {
       const data = JSON.parse(message);
-      
+
       // Validate message using our schema
       const result = AgentMessageBodySchema.safeParse(data);
-      
+
       if (result.success) {
         const messageBody = result.data;
-        
+
         if (messageBody.action === "cancel") {
           this.cancel();
           return;
@@ -443,7 +443,7 @@ export default {
           });
         } else if (messageBody.action === "cancel") {
           await agent.cancel();
-          
+
           return new Response("Agent cancelled successfully", {
             headers: { "Content-Type": "text/plain" },
             status: 200,
