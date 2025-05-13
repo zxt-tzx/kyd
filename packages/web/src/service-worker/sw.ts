@@ -37,15 +37,8 @@ if (!isDev) {
   registerRoute(new NavigationRoute(createHandlerBoundToURL("index.html")));
 }
 
-// in dev, don't wait and always use the latest worker
-if (isDev) {
-  self.skipWaiting();
-}
-
-self.addEventListener("message", (event) => {
-  // TODO: ReloadPrompt.tsx?
-  if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
-});
+// With autoUpdate, always skip waiting to apply updates immediately
+self.skipWaiting();
 
 // Register event listener for the 'push' event.
 self.addEventListener("push", function (event) {

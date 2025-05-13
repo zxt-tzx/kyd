@@ -17,15 +17,15 @@ export default defineConfig({
     VitePWA({
       strategies: "injectManifest",
       srcDir: "src/service-worker/",
-      filename: "prompt-sw.ts",
-      registerType: "prompt",
+      filename: "sw.ts",
+      registerType: "autoUpdate",
       devOptions: {
         enabled: true,
         type: "module",
       },
       injectManifest: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest}"],
-        globIgnores: ["**/prompt-sw*"],
+        globIgnores: ["**/sw*"],
       },
       manifest: {
         name: "Know Your Dev",

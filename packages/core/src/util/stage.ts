@@ -15,6 +15,6 @@ export function getUrl(stage: string) {
     case "prod":
       return "https://kyd.theintel.io";
     default:
-      return "https://local.theintel.io";
+      return "https://local.kyd.theintel.io:3000";
   }
 }
