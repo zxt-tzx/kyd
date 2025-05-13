@@ -1,4 +1,5 @@
 import { usePushNotification } from "@/hooks/usePushNotification";
+import { ButtonSpinner, ContainerSpinner } from "@/components/ui/spinner";
 
 export function PushNotificationManager() {
   const {
@@ -9,9 +10,15 @@ export function PushNotificationManager() {
     subscribeToPush,
     unsubscribeFromPush,
     sendTestNotification,
+    isInitializing,
+    isActionLoading,
   } = usePushNotification();
 
-  if (!isSupported) {
+  if (isInitializing) {
+    return <ContainerSpinner />;
+  }
+
+  if (isSupported === false) {
     return <p>Push notifications are not supported in this browser.</p>;
   }
 
@@ -24,9 +31,17 @@ export function PushNotificationManager() {
           <p>You are subscribed to push notifications.</p>
           <button
             onClick={unsubscribeFromPush}
-            className="rounded bg-red-600 px-4 py-2  hover:bg-red-700"
+            className="rounded bg-red-600 px-4 py-2 hover:bg-red-700 disabled:opacity-50"
+            disabled={isActionLoading}
           >
-            Unsubscribe
+            {isActionLoading ? (
+              <span className="flex items-center justify-center">
+                <ButtonSpinner className="border-white" />
+                Unsubscribing...
+              </span>
+            ) : (
+              "Unsubscribe"
+            )}
           </button>
 
           <div className="space-y-2">
@@ -38,13 +53,26 @@ export function PushNotificationManager() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="flex-1 rounded border px-3 py-2"
+                disabled={isActionLoading}
               />
               <button
-                onClick={() => sendTestNotification({ title: "Test", message })}
-                disabled={!message}
-                className="rounded bg-blue-600 px-4 py-2  hover:bg-blue-700 disabled:opacity-50"
+                onClick={() =>
+                  sendTestNotification({
+                    title: "An urgent notification!",
+                    message,
+                  })
+                }
+                disabled={!message || isActionLoading}
+                className="rounded bg-blue-600 px-4 py-2 hover:bg-blue-700 disabled:opacity-50"
               >
-                Send Test
+                {isActionLoading ? (
+                  <span className="flex items-center justify-center">
+                    <ButtonSpinner className="border-white" />
+                    Sending...
+                  </span>
+                ) : (
+                  "Send Test"
+                )}
               </button>
             </div>
           </div>
@@ -54,9 +82,17 @@ export function PushNotificationManager() {
           <p>You are not subscribed to push notifications.</p>
           <button
             onClick={subscribeToPush}
-            className="rounded bg-green-600 px-4 py-2  hover:bg-green-700"
+            className="rounded bg-green-600 px-4 py-2 hover:bg-green-700 disabled:opacity-50"
+            disabled={isActionLoading}
           >
-            Subscribe
+            {isActionLoading ? (
+              <span className="flex items-center justify-center">
+                <ButtonSpinner className="border-white" />
+                Subscribing...
+              </span>
+            ) : (
+              "Subscribe"
+            )}
           </button>
         </div>
       )}

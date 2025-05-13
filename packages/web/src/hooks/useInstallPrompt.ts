@@ -1,42 +1,48 @@
 import { useEffect, useState } from "react";
 
+import { useUserAgent } from "./useUserAgent";
+
 /**
  * React hook for managing PWA installation prompts
  *
- * Provides functionality to detect if the device is iOS and if the app is already
+ * Provides functionality to detect if the device is iOS/Android,
+ * if it's a mobile device, and if the app is already
  * running in standalone mode (installed as a PWA)
  */
 export function useInstallPrompt() {
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
+  const { userAgent, isLoading: userAgentIsLoading } = useUserAgent();
+  const [isIOS, setIsIOS] = useState<boolean | null>(null);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
+  const [isStandalone, setIsStandalone] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Detect iOS devices
-    setIsIOS(
-      /iPad|iPhone|iPod/.test(navigator.userAgent) &&
-        !(window as Window & { MSStream?: unknown }).MSStream,
-    );
+    if (typeof window !== "undefined") {
+      // Detect iOS devices
+      setIsIOS(
+        /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+          !(window as Window & { MSStream?: unknown }).MSStream,
+      );
 
-    // Check if already running in standalone mode (installed as PWA)
-    setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
+      // Detect mobile devices
+      setIsMobile(userAgent?.device.isMobile ?? false);
 
-    // // Also listen for changes in display mode
-    // const mediaQuery = window.matchMedia("(display-mode: standalone)");
-    // const handleChange = (e: MediaQueryListEvent) => {
-    //   setIsStandalone(e.matches);
-    // };
+      // Check if already running in standalone mode (installed as PWA)
+      setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
 
-    // // Add event listener for future changes (if user installs while app is open)
-    // mediaQuery.addEventListener("change", handleChange);
+      setIsLoading(false);
+    }
+  }, [userAgent]);
 
-    // // Clean up event listener
-    // return () => {
-    //   mediaQuery.removeEventListener("change", handleChange);
-    // };
-  }, []);
+  // Derive isAndroid from isMobile and isIOS (if mobile but not iOS, consider it Android)
+  const isAndroid = isMobile && !isIOS;
 
   return {
     isIOS,
+    isAndroid,
+    isMobile,
     isStandalone,
+    userAgent,
+    isLoading: userAgentIsLoading || isLoading,
   };
 }

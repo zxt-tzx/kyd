@@ -2,8 +2,6 @@ import {
   BuildingIcon,
   GlobeIcon,
   InfoIcon,
-  Loader2Icon,
-  LoaderIcon,
   MailIcon,
   MapPinIcon,
 } from "lucide-react";
@@ -11,6 +9,7 @@ import {
 import { useNewResearch } from "@/lib/hooks/useAgentResearch";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { ButtonSpinner, CircleSpinner } from "@/components/ui/spinner";
 import { XTwitterIcon } from "@/components/icons/XTwitterIcon";
 
 export type UserPreviewProps = {
@@ -124,9 +123,7 @@ export function UserPreview({
           }
           disabled={isLoading}
         >
-          {isLoading ? (
-            <Loader2Icon className="mr-2 size-4 animate-spin" />
-          ) : null}
+          {isLoading ? <ButtonSpinner /> : null}
           YES
         </Button>
         <Button
@@ -146,7 +143,7 @@ export function UserPreview({
 export function UserPreviewSkeleton() {
   return (
     <div className="flex items-center justify-center py-4">
-      <LoaderIcon className="size-6 animate-spin text-muted-foreground" />
+      <CircleSpinner className="text-muted-foreground" />
     </div>
   );
 }

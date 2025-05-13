@@ -2,9 +2,10 @@ import "./globals.css";
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { Loader2Icon } from "lucide-react";
 import { ThemeProvider } from "next-themes";
 import ReactDOM from "react-dom/client";
+
+import { Spinner } from "@/components/ui/spinner";
 
 import { queryClient } from "@/lib/queryClient";
 
@@ -19,7 +20,7 @@ const router = createRouter({
   context: { queryClient },
   defaultPendingComponent: () => (
     <div className="mx-auto mt-8 flex flex-col items-center justify-center">
-      <Loader2Icon className="animate-spin" />
+      <Spinner size="md" />
       <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
     </div>
   ),

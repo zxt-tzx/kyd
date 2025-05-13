@@ -55,22 +55,7 @@ self.addEventListener("push", function (event) {
       return;
     }
     const {
-      options: {
-        body,
-        // actions,
-        badge,
-        // data,
-        // dir,
-        icon,
-        // image,
-        // lang,
-        // renotify,
-        // requireInteraction,
-        // silent,
-        // tag,
-        // timestamp,
-        vibrate,
-      },
+      options: { body, badge, icon },
       title,
     } = res.data;
 
@@ -80,7 +65,6 @@ self.addEventListener("push", function (event) {
       body,
       icon: icon ?? "/icon.png",
       badge: badge ?? "/badge.png",
-      vibrate: vibrate ?? [100, 50, 100],
       // Optional settings - uncomment as needed
       // tag: 'kyd-research', // Group related notifications
       // renotify: true, // Alert user even if there's an existing notification with same tag
@@ -101,7 +85,6 @@ self.addEventListener("push", function (event) {
 });
 
 self.addEventListener("notificationclick", function (event) {
-  console.log("Notification click received.");
   event.notification.close();
 
   // Retrieve data from the notification
